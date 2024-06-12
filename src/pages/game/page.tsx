@@ -131,6 +131,7 @@ export const GamePage = () => {
                         const { color } = game.get(square);
 
                         if (currentPlayer !== color) return;
+                        unHighlightSquares();
 
                         const enabledMoves = game.moves({ square });
 
@@ -144,8 +145,6 @@ export const GamePage = () => {
                         highlightSquares(square, enabledMoves);
                     }}
                     onSquareClick={(square, piece) => {
-                        unHighlightSquares();
-
                         if (
                             selectedPiece.square === "" ||
                             (selectedPiece.square !== "" &&
@@ -173,6 +172,7 @@ export const GamePage = () => {
                                 color: "",
                                 moves: []
                             }));
+                            unHighlightSquares();
                         }
                     }}
                     onPieceDragBegin={(piece, square) => {
