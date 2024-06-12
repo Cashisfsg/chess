@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 export const SettingsPage = () => {
     return (
-        <main className="grid h-full grid-rows-[auto_1fr_auto]">
+        <main className="grid flex-auto grid-rows-[auto_1fr_auto] gap-y-8">
             <h1 className="text-4xl font-bold">Настройки</h1>
 
             <section className="grid place-content-center gap-y-4">
