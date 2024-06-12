@@ -1,32 +1,9 @@
-import {
-    useState,
-    useReducer,
-    useMemo,
-    useEffect,
-    useRef,
-    useLayoutEffect
-} from "react";
+import { useState, useReducer } from "react";
 import { Chess, Square } from "chess.js";
-import { Chessboard, ClearPremoves } from "react-chessboard";
-import { CustomPieceFnArgs } from "react-chessboard/dist/chessboard/types";
-// import Bishop from "./assets/bishop.png";
-// import Pawn from "./assets/pawn.png";
-// import Knight from "./assets/knight.png";
-// import King from "./assets/king.png";
-// import "./App.css";
-import { useFirstRender } from "./hooks/use-first-render";
-import { useIsMounted } from "./hooks/use-is-mounted";
-import { Select } from "./components/select/select";
-
-const COLUMNS = ["a", "b", "c", "d", "e", "f", "g", "h"];
-const ROWS = ["1", "2", "3", "4", "5", "6", "7", "8"];
-const SQUARES = COLUMNS.flatMap(column =>
-    ROWS.map(row => `[data-square=${column + row}]`)
-).join(", ");
+import { Chessboard } from "react-chessboard";
 
 export const GamePage = () => {
     const [game, setGame] = useState(new Chess());
-    const [possibleMoves, setPossibleMoves] = useState<HTMLElement[]>([]);
     const [currentPlayer, togglePlayer] = useReducer(state => {
         if (state === "w") {
             return "b";
@@ -66,108 +43,95 @@ export const GamePage = () => {
                 to: targetSquare,
                 promotion: "q" // always promote to a queen for example simplicity
             });
-            setSelectedPiece(piece => ({
-                ...piece,
-                square: "",
-                color: "",
-                moves: []
-            }));
+
             togglePlayer();
-            unHighlightSquares();
-            unHighlightSelectedPiece();
+
             return true;
         } catch (error) {
             return false;
         }
     }
 
-    const selectAvailableSquares = (enabledMoves: string[]): HTMLElement[] => {
-        try {
-            return Array.from(
-                document.querySelectorAll(
-                    enabledMoves
-                        .map(square => {
-                            const regex = new RegExp("^[a-hBKNRQ]x[a-h][1-8]$");
+    // const selectAvailableSquares = (
+    //     availableMoves: string[]
+    // ): HTMLElement[] => {
+    //     if (availableMoves.length === 0) return [];
 
-                            if (regex.test(square)) {
-                                return `[data-square=${square.substring(2)}]`;
-                            } else {
-                                return `[data-square=${
-                                    square.match(/[a-hBKNRQ][1-8]/)?.[0]
-                                }]`;
-                            }
-                        })
-                        .join(", ")
-                )
-            );
-        } catch (error) {
-            return [];
-        }
-    };
+    //     try {
+    //         return Array.from(
+    //             document.querySelectorAll(
+    //                 availableMoves
+    //                     .map(square => {
+    //                         const regex = new RegExp("^[a-hBKNRQ]x[a-h][1-8]$");
 
-    const highlightSelectedPiece = (square: string) => {
-        const piece = document.querySelector(
-            `[data-square=${square}]`
-        ) as HTMLElement;
-
-        if (!piece) return;
-
-        piece.classList.add("selected-piece");
-    };
-
-    const unHighlightSelectedPiece = () => {
-        if (selectedPiece.square === "") return;
-
-        const piece = document.querySelector(
-            `[data-square=${selectedPiece.square}]`
-        ) as HTMLElement;
-
-        if (!piece) return;
-
-        piece.classList.remove("selected-piece");
-    };
+    //                         if (regex.test(square)) {
+    //                             return `[data-square=${square.substring(2)}]`;
+    //                         } else {
+    //                             return `[data-square=${
+    //                                 square.match(/[a-hBKNRQ][1-8]/)?.[0]
+    //                             }]`;
+    //                         }
+    //                     })
+    //                     .join(", ")
+    //             )
+    //         );
+    //     } catch (error) {
+    //         return [];
+    //     }
+    // };
 
     const highlightSquares = (
-        availableSquares: HTMLElement[],
-        availableMoves: string[],
-        attackedMoves: string[]
+        pieceSquare: string,
+        availableMoves: string[]
     ): void => {
-        availableSquares.forEach(square => {
-            const coords = square.getAttribute("data-square");
+        document
+            .querySelector(`[data-square=${pieceSquare}]`)
+            ?.classList.add("selected-piece");
 
-            if (!coords) return;
+        availableMoves.forEach(move => {
+            const regex = new RegExp("^[a-hBKNRQ]x[a-h][1-8][+]?$");
 
-            if (attackedMoves.includes(coords)) {
-                square.classList.add("attacked");
-            } else if (availableMoves.includes(coords)) {
-                square.classList.add("possible");
+            const match = move.match(/[a-hBKNRQ][1-8]/);
+
+            if (!match) return;
+
+            if (regex.test(move)) {
+                document
+                    .querySelector(`[data-square=${match[0]}]`)
+                    ?.classList.add("attacked");
+            } else {
+                document
+                    .querySelector(`[data-square=${match[0]}]`)
+                    ?.classList.add("possible");
             }
         });
     };
 
     const unHighlightSquares = () => {
-        possibleMoves.forEach(square => {
-            square.classList.remove("possible", "attacked");
-        });
+        document
+            .querySelectorAll("[data-square]")
+            .forEach(square =>
+                square.classList.remove(
+                    "selected-piece",
+                    "possible",
+                    "attacked"
+                )
+            );
     };
 
     return (
         <main className="flex max-h-full flex-auto basis-full flex-col gap-y-8">
             <p>Player 1</p>
             <div className="flex aspect-square flex-auto items-center">
-                {/* <Select /> */}
                 <Chessboard
                     areArrowsAllowed={true}
                     boardOrientation="white"
                     position={game.fen()}
                     onPieceClick={(piece, square) => {
-                        console.log("Piece clicked", game.get(square));
-
-                        if (currentPlayer !== game.get(square).color) return;
-                        unHighlightSquares();
-                        unHighlightSelectedPiece();
-
                         const { color } = game.get(square);
+
+                        if (currentPlayer !== color) return;
+
                         const enabledMoves = game.moves({ square });
 
                         setSelectedPiece(piece => ({
@@ -176,57 +140,10 @@ export const GamePage = () => {
                             color,
                             moves: enabledMoves
                         }));
-                        console.log(enabledMoves);
 
-                        const moveableSquares =
-                            selectAvailableSquares(enabledMoves);
-
-                        const availableMoves = enabledMoves
-                            .filter(move => {
-                                const regex = new RegExp(
-                                    "^[a-hBKNRQ]x[a-h][1-8]$"
-                                );
-
-                                return !regex.test(move);
-                            })
-                            .map(move => {
-                                const match = move.match(/[a-hBKNRQ][1-8]/);
-
-                                if (!match) return "";
-
-                                return match[0];
-                            });
-
-                        const attackedMoves = enabledMoves
-                            .filter(move => {
-                                const regex = new RegExp(
-                                    "^[a-hBKNRQ]x[a-h][1-8][+]?$"
-                                );
-
-                                return regex.test(move);
-                            })
-                            .map(move => {
-                                const match = move.match(/[a-hBKNRQ][1-8]/);
-
-                                console.log("mathc", match);
-
-                                if (!match) return "";
-
-                                return match[0];
-                            });
-
-                        highlightSquares(
-                            moveableSquares,
-                            availableMoves,
-                            attackedMoves
-                        );
-                        highlightSelectedPiece(square);
-
-                        setPossibleMoves(moveableSquares);
+                        highlightSquares(square, enabledMoves);
                     }}
                     onSquareClick={(square, piece) => {
-                        console.log("Click square clicked");
-
                         if (
                             selectedPiece.square === "" ||
                             (selectedPiece.square !== "" &&
@@ -255,111 +172,24 @@ export const GamePage = () => {
                                 moves: []
                             }));
                             unHighlightSquares();
-                            unHighlightSelectedPiece();
-                            setPossibleMoves([]);
                         }
                     }}
-                    // promotionToSquare={possibleMoves}
-                    // promotionDialogVariant="vertical"
-                    // showPromotionDialog={true}
                     onPieceDragBegin={(piece, square) => {
-                        if (currentPlayer !== game.get(square).color) return;
-                        unHighlightSquares();
-                        unHighlightSelectedPiece();
-
+                        // Проверка если текущая фигура не принадлежит игроку ничего не делать
                         const { color } = game.get(square);
-                        const enabledMoves = game.moves({ square });
 
-                        setSelectedPiece(piece => ({
-                            ...piece,
-                            square,
-                            color,
-                            moves: enabledMoves
-                        }));
-                        console.log(enabledMoves);
+                        if (currentPlayer !== color) return;
 
-                        const moveableSquares =
-                            selectAvailableSquares(enabledMoves);
+                        const availableMoves = game.moves({ square });
 
-                        const availableMoves = enabledMoves
-                            .filter(move => {
-                                const regex = new RegExp(
-                                    "^[a-hBKNRQ]x[a-h][1-8]$"
-                                );
-
-                                return !regex.test(move);
-                            })
-                            .map(move => {
-                                const match = move.match(/[a-hBKNRQ][1-8]/);
-
-                                if (!match) return "";
-
-                                return match[0];
-                            });
-
-                        const attackedMoves = enabledMoves
-                            .filter(move => {
-                                const regex = new RegExp(
-                                    "^[a-hBKNRQ]x[a-h][1-8][+]?$"
-                                );
-
-                                return regex.test(move);
-                            })
-                            .map(move => {
-                                const match = move.match(/[a-hBKNRQ][1-8]/);
-
-                                console.log("mathc", match);
-
-                                if (!match) return "";
-
-                                return match[0];
-                            });
-
-                        highlightSquares(
-                            moveableSquares,
-                            availableMoves,
-                            attackedMoves
-                        );
-                        highlightSelectedPiece(square);
-
-                        setPossibleMoves(moveableSquares);
+                        highlightSquares(square, availableMoves);
                     }}
+                    onPieceDragEnd={unHighlightSquares}
                     onPieceDrop={onDrop}
                     // customPieces={{ bP: wK }}
                 />
             </div>
             <p>Player 2</p>
         </main>
-    );
-};
-
-interface Piece extends CustomPieceFnArgs {}
-
-const wK = (props: CustomPieceFnArgs) => {
-    return (
-        // <div
-        //     {...props}
-        //     style={{
-        //         // width: "100%",
-        //         // height: "",
-        //         display: "flex",
-        //         justifyContent: "center",
-        //         alignItems: "center",
-        //     }}
-        // >
-        <img
-            src={King}
-            style={{
-                width: "125px",
-                height: "125px",
-                objectFit: "contain",
-                objectPosition: "center",
-                userSelect: "none"
-            }}
-            {...props}
-            // height="50"
-            // width="50"
-        />
-        // </div>
     );
 };
