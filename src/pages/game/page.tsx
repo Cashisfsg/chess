@@ -152,119 +152,125 @@ export const GamePage = () => {
     };
 
     return (
-        <div className="grid h-full w-screen grid-cols-1 place-content-center">
-            {/* <Select /> */}
-            <Chessboard
-                areArrowsAllowed={true}
-                boardOrientation="white"
-                position={game.fen()}
-                onPieceClick={(piece, square) => {
-                    console.log("Piece clicked", game.get(square));
+        <main className="flex max-h-full flex-auto basis-full flex-col gap-y-8">
+            <p>Player 1</p>
+            <div className="flex aspect-square flex-auto items-center">
+                {/* <Select /> */}
+                <Chessboard
+                    areArrowsAllowed={true}
+                    boardOrientation="white"
+                    position={game.fen()}
+                    onPieceClick={(piece, square) => {
+                        console.log("Piece clicked", game.get(square));
 
-                    if (currentPlayer !== game.get(square).color) return;
-                    unHighlightSquares();
-                    unHighlightSelectedPiece();
-
-                    const { color } = game.get(square);
-                    const enabledMoves = game.moves({ square });
-
-                    setSelectedPiece(piece => ({
-                        ...piece,
-                        square,
-                        color,
-                        moves: enabledMoves
-                    }));
-                    console.log(enabledMoves);
-
-                    const moveableSquares =
-                        selectAvailableSquares(enabledMoves);
-
-                    const availableMoves = enabledMoves
-                        .filter(move => {
-                            const regex = new RegExp("^[a-hBKNRQ]x[a-h][1-8]$");
-
-                            return !regex.test(move);
-                        })
-                        .map(move => {
-                            const match = move.match(/[a-hBKNRQ][1-8]/);
-
-                            if (!match) return "";
-
-                            return match[0];
-                        });
-
-                    const attackedMoves = enabledMoves
-                        .filter(move => {
-                            const regex = new RegExp(
-                                "^[a-hBKNRQ]x[a-h][1-8][+]?$"
-                            );
-
-                            return regex.test(move);
-                        })
-                        .map(move => {
-                            const match = move.match(/[a-hBKNRQ][1-8]/);
-
-                            console.log("mathc", match);
-
-                            if (!match) return "";
-
-                            return match[0];
-                        });
-
-                    highlightSquares(
-                        moveableSquares,
-                        availableMoves,
-                        attackedMoves
-                    );
-                    highlightSelectedPiece(square);
-
-                    setPossibleMoves(moveableSquares);
-                }}
-                onSquareClick={(square, piece) => {
-                    console.log("Click square clicked");
-
-                    if (
-                        selectedPiece.square === "" ||
-                        (selectedPiece.square !== "" &&
-                            piece !== undefined &&
-                            piece.startsWith(selectedPiece.color))
-                    ) {
-                        console.log(square, piece);
-
-                        return;
-                    }
-
-                    try {
-                        makeAMove({
-                            from: selectedPiece.square,
-                            to: square,
-                            promotion: "q" // always promote to a queen for example simplicity
-                        });
-                        togglePlayer();
-                    } catch (error) {
-                        console.log("Invalid move");
-                    } finally {
-                        setSelectedPiece(piece => ({
-                            ...piece,
-                            square: "",
-                            color: "",
-                            moves: []
-                        }));
+                        if (currentPlayer !== game.get(square).color) return;
                         unHighlightSquares();
                         unHighlightSelectedPiece();
-                        setPossibleMoves([]);
-                    }
-                }}
-                // promotionToSquare={possibleMoves}
-                // promotionDialogVariant="vertical"
-                // showPromotionDialog={true}
-                onPieceDragBegin={piece => {
-                    console.log(piece);
-                }}
-                onPieceDrop={onDrop}
-                // customPieces={{ bP: wK }}
-            />
-        </div>
+
+                        const { color } = game.get(square);
+                        const enabledMoves = game.moves({ square });
+
+                        setSelectedPiece(piece => ({
+                            ...piece,
+                            square,
+                            color,
+                            moves: enabledMoves
+                        }));
+                        console.log(enabledMoves);
+
+                        const moveableSquares =
+                            selectAvailableSquares(enabledMoves);
+
+                        const availableMoves = enabledMoves
+                            .filter(move => {
+                                const regex = new RegExp(
+                                    "^[a-hBKNRQ]x[a-h][1-8]$"
+                                );
+
+                                return !regex.test(move);
+                            })
+                            .map(move => {
+                                const match = move.match(/[a-hBKNRQ][1-8]/);
+
+                                if (!match) return "";
+
+                                return match[0];
+                            });
+
+                        const attackedMoves = enabledMoves
+                            .filter(move => {
+                                const regex = new RegExp(
+                                    "^[a-hBKNRQ]x[a-h][1-8][+]?$"
+                                );
+
+                                return regex.test(move);
+                            })
+                            .map(move => {
+                                const match = move.match(/[a-hBKNRQ][1-8]/);
+
+                                console.log("mathc", match);
+
+                                if (!match) return "";
+
+                                return match[0];
+                            });
+
+                        highlightSquares(
+                            moveableSquares,
+                            availableMoves,
+                            attackedMoves
+                        );
+                        highlightSelectedPiece(square);
+
+                        setPossibleMoves(moveableSquares);
+                    }}
+                    onSquareClick={(square, piece) => {
+                        console.log("Click square clicked");
+
+                        if (
+                            selectedPiece.square === "" ||
+                            (selectedPiece.square !== "" &&
+                                piece !== undefined &&
+                                piece.startsWith(selectedPiece.color))
+                        ) {
+                            console.log(square, piece);
+
+                            return;
+                        }
+
+                        try {
+                            makeAMove({
+                                from: selectedPiece.square,
+                                to: square,
+                                promotion: "q" // always promote to a queen for example simplicity
+                            });
+                            togglePlayer();
+                        } catch (error) {
+                            console.log("Invalid move");
+                        } finally {
+                            setSelectedPiece(piece => ({
+                                ...piece,
+                                square: "",
+                                color: "",
+                                moves: []
+                            }));
+                            unHighlightSquares();
+                            unHighlightSelectedPiece();
+                            setPossibleMoves([]);
+                        }
+                    }}
+                    // promotionToSquare={possibleMoves}
+                    // promotionDialogVariant="vertical"
+                    // showPromotionDialog={true}
+                    onPieceDragBegin={piece => {
+                        console.log(piece);
+                    }}
+                    onPieceDrop={onDrop}
+                    // customPieces={{ bP: wK }}
+                />
+            </div>
+            <p>Player 2</p>
+        </main>
     );
 };
 
