@@ -12,13 +12,13 @@
 }
 
 .selected-piece {
-    box-shadow: inset 0px 0px 35px rgba(255, 255, 0, 0.8);
+    box-shadow: inset 0px 0px 5vw rgba(255, 255, 0, 0.8);
 }
 
 .attacked {
-    box-shadow: inset 0px 0px 35px rgba(255, 0, 0, 0.8);
+    box-shadow: inset 0px 0px 5vw rgba(255, 0, 0, 0.8);
 }
 
 .possible {
-    box-shadow: inset 0px 0px 35px rgba(0, 200, 200, 0.8);
+    box-shadow: inset 0px 0px 5vw rgba(0, 200, 200, 0.8);
 }

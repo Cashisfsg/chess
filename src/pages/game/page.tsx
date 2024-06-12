@@ -262,8 +262,67 @@ export const GamePage = () => {
                     // promotionToSquare={possibleMoves}
                     // promotionDialogVariant="vertical"
                     // showPromotionDialog={true}
-                    onPieceDragBegin={piece => {
-                        console.log(piece);
+                    onPieceDragBegin={(piece, square) => {
+                        if (currentPlayer !== game.get(square).color) return;
+                        unHighlightSquares();
+                        unHighlightSelectedPiece();
+
+                        const { color } = game.get(square);
+                        const enabledMoves = game.moves({ square });
+
+                        setSelectedPiece(piece => ({
+                            ...piece,
+                            square,
+                            color,
+                            moves: enabledMoves
+                        }));
+                        console.log(enabledMoves);
+
+                        const moveableSquares =
+                            selectAvailableSquares(enabledMoves);
+
+                        const availableMoves = enabledMoves
+                            .filter(move => {
+                                const regex = new RegExp(
+                                    "^[a-hBKNRQ]x[a-h][1-8]$"
+                                );
+
+                                return !regex.test(move);
+                            })
+                            .map(move => {
+                                const match = move.match(/[a-hBKNRQ][1-8]/);
+
+                                if (!match) return "";
+
+                                return match[0];
+                            });
+
+                        const attackedMoves = enabledMoves
+                            .filter(move => {
+                                const regex = new RegExp(
+                                    "^[a-hBKNRQ]x[a-h][1-8][+]?$"
+                                );
+
+                                return regex.test(move);
+                            })
+                            .map(move => {
+                                const match = move.match(/[a-hBKNRQ][1-8]/);
+
+                                console.log("mathc", match);
+
+                                if (!match) return "";
+
+                                return match[0];
+                            });
+
+                        highlightSquares(
+                            moveableSquares,
+                            availableMoves,
+                            attackedMoves
+                        );
+                        highlightSelectedPiece(square);
+
+                        setPossibleMoves(moveableSquares);
                     }}
                     onPieceDrop={onDrop}
                     // customPieces={{ bP: wK }}
