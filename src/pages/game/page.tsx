@@ -144,6 +144,8 @@ export const GamePage = () => {
                         highlightSquares(square, enabledMoves);
                     }}
                     onSquareClick={(square, piece) => {
+                        unHighlightSquares();
+
                         if (
                             selectedPiece.square === "" ||
                             (selectedPiece.square !== "" &&
@@ -171,7 +173,6 @@ export const GamePage = () => {
                                 color: "",
                                 moves: []
                             }));
-                            unHighlightSquares();
                         }
                     }}
                     onPieceDragBegin={(piece, square) => {
