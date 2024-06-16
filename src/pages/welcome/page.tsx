@@ -1,6 +1,25 @@
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
+import { TelegramClient } from "../../shared/api/telegram/types";
 
 export const WelcomePage = () => {
+    const tg = (
+        window as Window & typeof globalThis & { Telegram: TelegramClient }
+    ).Telegram.WebApp;
+
+    useEffect(() => {
+        fetch("http://89.117.54.23:5101/init-data", {
+            method: "POST",
+            body: JSON.stringify({
+                id: tg.initDataUnsafe.user.id,
+                username: tg.initDataUnsafe.user.username
+            }),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+    }, []);
+
     return (
         <main className="grid flex-auto place-content-center gap-y-8">
             <header>

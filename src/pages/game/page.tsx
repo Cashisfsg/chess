@@ -1,9 +1,10 @@
-import { useState, useReducer } from "react";
+import { useState, useMemo, useReducer } from "react";
 import { Chess, Square } from "chess.js";
 import { Chessboard } from "react-chessboard";
 
 export const GamePage = () => {
-    const [game, setGame] = useState(new Chess());
+    const chess = useMemo(() => new Chess(), []);
+    const [fen, setFen] = useState(chess.fen());
     const [currentPlayer, togglePlayer] = useReducer(state => {
         if (state === "w") {
             return "b";
@@ -28,12 +29,11 @@ export const GamePage = () => {
             | {
                   from: string;
                   to: string;
-                  promotion?: string | undefined;
+                  promotion?: string;
               }
     ) {
-        const gameCopy = new Chess(game.fen());
-        gameCopy.move(move);
-        setGame(gameCopy);
+        chess.move(move);
+        setFen(chess.fen());
     }
 
     function onDrop(sourceSquare: Square, targetSquare: Square) {
@@ -126,14 +126,14 @@ export const GamePage = () => {
                 <Chessboard
                     areArrowsAllowed={true}
                     boardOrientation="white"
-                    position={game.fen()}
+                    position={fen}
                     onPieceClick={(piece, square) => {
-                        const { color } = game.get(square);
+                        const { color } = chess.get(square);
 
                         if (currentPlayer !== color) return;
                         unHighlightSquares();
 
-                        const enabledMoves = game.moves({ square });
+                        const enabledMoves = chess.moves({ square });
 
                         setSelectedPiece(piece => ({
                             ...piece,
@@ -176,18 +176,17 @@ export const GamePage = () => {
                         }
                     }}
                     onPieceDragBegin={(piece, square) => {
-                        // Проверка если текущая фигура не принадлежит игроку ничего не делать
-                        const { color } = game.get(square);
+                        const { color } = chess.get(square);
 
+                        // Проверка если текущая фигура не принадлежит игроку ничего не делать
                         if (currentPlayer !== color) return;
 
-                        const availableMoves = game.moves({ square });
+                        const availableMoves = chess.moves({ square });
 
                         highlightSquares(square, availableMoves);
                     }}
                     onPieceDragEnd={unHighlightSquares}
                     onPieceDrop={onDrop}
-                    // customPieces={{ bP: wK }}
                 />
             </div>
             <p>Player 2</p>
