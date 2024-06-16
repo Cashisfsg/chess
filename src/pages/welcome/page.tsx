@@ -9,7 +9,7 @@ export const WelcomePage = () => {
 
     useEffect(() => {
         try {
-            fetch("http://89.117.54.23:5101/init-data", {
+            fetch("https://chesswebapp.ru/init-data", {
                 method: "POST",
                 body: JSON.stringify({
                     id: tg?.initDataUnsafe?.user?.id,
