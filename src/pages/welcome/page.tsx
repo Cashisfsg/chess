@@ -8,16 +8,20 @@ export const WelcomePage = () => {
     ).Telegram.WebApp;
 
     useEffect(() => {
-        fetch("http://89.117.54.23:5101/init-data", {
-            method: "POST",
-            body: JSON.stringify({
-                id: tg.initDataUnsafe.user.id,
-                username: tg.initDataUnsafe.user.username
-            }),
-            headers: {
-                "Content-Type": "application/json"
-            }
-        });
+        try {
+            fetch("http://89.117.54.23:5101/init-data", {
+                method: "POST",
+                body: JSON.stringify({
+                    id: tg?.initDataUnsafe?.user?.id,
+                    username: tg?.initDataUnsafe?.user?.username
+                }),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+        } catch (error) {
+            console.error(error.message);
+        }
     }, []);
 
     return (
