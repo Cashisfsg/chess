@@ -2,6 +2,14 @@ import { useState, useMemo, useReducer } from "react";
 import { Chess, Square } from "chess.js";
 import { Chessboard } from "react-chessboard";
 
+type Move =
+    | string
+    | {
+          from: string;
+          to: string;
+          promotion?: string;
+      };
+
 export const GamePage = () => {
     const chess = useMemo(() => new Chess(), []);
     const [fen, setFen] = useState(chess.fen());
@@ -23,16 +31,9 @@ export const GamePage = () => {
         moves: []
     });
 
-    function makeAMove(
-        move:
-            | string
-            | {
-                  from: string;
-                  to: string;
-                  promotion?: string;
-              }
-    ) {
+    function makeAMove(move: Move) {
         chess.move(move);
+
         setFen(chess.fen());
     }
 
@@ -45,6 +46,10 @@ export const GamePage = () => {
             });
 
             togglePlayer();
+
+            if (chess.isGameOver()) {
+                alert("Game over");
+            }
 
             return true;
         } catch (error) {
@@ -88,9 +93,9 @@ export const GamePage = () => {
             .querySelector(`[data-square=${pieceSquare}]`)
             ?.classList.add("selected-piece");
 
-        availableMoves.forEach(move => {
-            const regex = new RegExp("^[a-hBKNRQ]x[a-h][1-8][+]?$");
+        const regex = new RegExp("^[a-hBKNRQ]x[a-h][1-8][+]?$");
 
+        availableMoves.forEach(move => {
             const match = move.match(/[a-hBKNRQ][1-8]/);
 
             if (!match) return;
@@ -125,8 +130,9 @@ export const GamePage = () => {
             <div className="flex aspect-square flex-auto items-center">
                 <Chessboard
                     areArrowsAllowed={true}
-                    boardOrientation="white"
+                    boardOrientation="black"
                     position={fen}
+                    // isDraggablePiece={() => false}
                     onPieceClick={(piece, square) => {
                         const { color } = chess.get(square);
 
