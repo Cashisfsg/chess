@@ -34,19 +34,20 @@ export const SettingsPage = () => {
         const { userId, fullName, userName } = event.currentTarget;
 
         try {
-            const queryParams = {
+            const newUser = {
                 user_id: userId.value,
                 fullname: fullName.value,
                 username: userName.value
             };
 
-            const response = await createNewUser(queryParams);
+            const response = await createNewUser(newUser);
 
             if (!response.ok) {
                 throw new Error("Something went wrong");
             }
 
-            localStorage.setItem("user", JSON.stringify(queryParams));
+            localStorage.setItem("user", JSON.stringify(newUser));
+            setUser(newUser);
         } catch (error) {
             console.error(error);
         }

@@ -11,7 +11,7 @@ export const createNewUser = async (queryParams: QueryParams) => {
         searchParams.append(key, value.toString());
     });
 
-    await fetch(
+    return await fetch(
         `http://www.chesswebapp.xyz:5101/create_user?${searchParams.toString()}`,
         {
             method: "POST",
