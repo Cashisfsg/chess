@@ -15,7 +15,7 @@ export const RoomPage = () => {
         if (!("roomId" in params)) return;
 
         const socket = new WebSocket(
-            `wss://www.chesswebapp.xyz:12345/room/play?room_id=${params.roomId}&user_id=${JSON.parse(localStorage.getItem("user") || "{}")?.user_id}`
+            `wss://www.chesswebapp.xyz/room/play?room_id=${params.roomId}&user_id=${JSON.parse(localStorage.getItem("user") || "{}")?.user_id}`
         );
 
         socket.onopen = () => {
