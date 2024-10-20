@@ -24,7 +24,7 @@ export const baseQuery = async (
     console.log(searchParams.toString());
 
     return await fetch(
-        `http://chesswebapp.xyz:12345/api/v1${endpoint}`,
+        `https://chesswebapp.xyz/api/v1${endpoint}`,
         requestOptions
     );
 };

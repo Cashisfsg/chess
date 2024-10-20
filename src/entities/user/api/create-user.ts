@@ -12,7 +12,7 @@ export const createNewUser = async (queryParams: QueryParams) => {
     });
 
     return await fetch(
-        `http://www.chesswebapp.xyz:5101/create_user?${searchParams.toString()}`,
+        `https://www.chesswebapp.xyz/create_user?${searchParams.toString()}`,
         {
             method: "POST",
             headers: {

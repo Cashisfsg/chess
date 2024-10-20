@@ -16,6 +16,8 @@ export const SettingsPage = () => {
         username: string;
     } | null>(null);
 
+    const navigate = useNavigate();
+
     useEffect(() => {
         const storedUser = localStorage.getItem("user");
 
@@ -23,8 +25,6 @@ export const SettingsPage = () => {
 
         setUser(JSON.parse(storedUser));
     }, []);
-
-    const navigate = useNavigate();
 
     const onSubmitHandler: React.FormEventHandler<
         HTMLFormElement & FormFields

@@ -1,22 +1,10 @@
-import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { TelegramClient } from "../../shared/api/telegram/types";
-import { createUser } from "../../shared/api/endpoints";
 
 export const WelcomePage = () => {
     const tg = (
         window as Window & typeof globalThis & { Telegram: TelegramClient }
     ).Telegram.WebApp;
-
-    useEffect(() => {
-        (async () => {
-            try {
-                await createUser();
-            } catch (error) {
-                console.error(error.message);
-            }
-        })();
-    }, []);
 
     return (
         <main className="grid flex-auto place-content-center gap-y-8">
