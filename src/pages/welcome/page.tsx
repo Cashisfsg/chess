@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { TelegramClient } from "../../shared/api/telegram/types";
+import { createUser } from "../../shared/api/endpoints";
 
 export const WelcomePage = () => {
     const tg = (
@@ -8,20 +9,13 @@ export const WelcomePage = () => {
     ).Telegram.WebApp;
 
     useEffect(() => {
-        try {
-            fetch("https://chesswebapp.ru/init-data", {
-                method: "POST",
-                body: JSON.stringify({
-                    id: tg?.initDataUnsafe?.user?.id,
-                    username: tg?.initDataUnsafe?.user?.username
-                }),
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            });
-        } catch (error) {
-            console.error(error.message);
-        }
+        (async () => {
+            try {
+                await createUser();
+            } catch (error) {
+                console.error(error.message);
+            }
+        })();
     }, []);
 
     return (

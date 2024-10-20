@@ -1,6 +1,10 @@
-import { useState, useMemo, useReducer } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { Chess, Square } from "chess.js";
 import { Chessboard } from "react-chessboard";
+
+import { searchGame } from "../../shared/api/endpoints";
+import { TelegramClient } from "../../shared/api/telegram/types";
 
 type Move =
     | string
@@ -13,13 +17,8 @@ type Move =
 export const GamePage = () => {
     const chess = useMemo(() => new Chess(), []);
     const [fen, setFen] = useState(chess.fen());
-    const [currentPlayer, togglePlayer] = useReducer(state => {
-        if (state === "w") {
-            return "b";
-        } else {
-            return "w";
-        }
-    }, "w");
+
+    const navigate = useNavigate();
 
     const [selectedPiece, setSelectedPiece] = useState<{
         square: string;
@@ -30,6 +29,23 @@ export const GamePage = () => {
         color: "",
         moves: []
     });
+
+    const tg = (
+        window as Window & typeof globalThis & { Telegram: TelegramClient }
+    ).Telegram.WebApp;
+
+    useEffect(() => {
+        (async () => {
+            try {
+                const response = await searchGame({
+                    user_id: "123"
+                });
+                navigate(`/room/${response}`);
+            } catch (error) {
+                console.error(error);
+            }
+        })();
+    }, [tg?.initDataUnsafe?.user?.id]);
 
     function makeAMove(move: Move) {
         chess.move(move);
@@ -44,8 +60,6 @@ export const GamePage = () => {
                 to: targetSquare,
                 promotion: "q" // always promote to a queen for example simplicity
             });
-
-            togglePlayer();
 
             if (chess.isGameOver()) {
                 alert("Game over");
@@ -136,7 +150,8 @@ export const GamePage = () => {
                     onPieceClick={(piece, square) => {
                         const { color } = chess.get(square);
 
-                        if (currentPlayer !== color) return;
+                        if (chess.turn() !== color) return;
+
                         unHighlightSquares();
 
                         const enabledMoves = chess.moves({ square });
@@ -168,7 +183,6 @@ export const GamePage = () => {
                                 to: square,
                                 promotion: "q" // always promote to a queen for example simplicity
                             });
-                            togglePlayer();
                         } catch (error) {
                             console.log("Invalid move");
                         } finally {
@@ -185,7 +199,7 @@ export const GamePage = () => {
                         const { color } = chess.get(square);
 
                         // Проверка если текущая фигура не принадлежит игроку ничего не делать
-                        if (currentPlayer !== color) return;
+                        if (chess.turn() !== color) return;
 
                         const availableMoves = chess.moves({ square });
 

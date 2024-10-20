@@ -1,17 +1,132 @@
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { createNewUser } from "../../entities/user/api/create-user";
+import { searchGame } from "../../shared/api/endpoints";
+
+interface FormFields {
+    userId: HTMLInputElement;
+    fullName: HTMLInputElement;
+    userName: HTMLInputElement;
+}
 
 export const SettingsPage = () => {
+    const [user, setUser] = useState<{
+        user_id: string;
+        fullname: string;
+        username: string;
+    } | null>(null);
+
+    useEffect(() => {
+        const storedUser = localStorage.getItem("user");
+
+        if (!storedUser) return;
+
+        setUser(JSON.parse(storedUser));
+    }, []);
+
+    const navigate = useNavigate();
+
+    const onSubmitHandler: React.FormEventHandler<
+        HTMLFormElement & FormFields
+    > = async event => {
+        event.preventDefault();
+
+        const { userId, fullName, userName } = event.currentTarget;
+
+        try {
+            const queryParams = {
+                user_id: userId.value,
+                fullname: fullName.value,
+                username: userName.value
+            };
+
+            const response = await createNewUser(queryParams);
+
+            if (!response.ok) {
+                throw new Error("Something went wrong");
+            }
+
+            localStorage.setItem("user", JSON.stringify(queryParams));
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const onClickHandler: React.MouseEventHandler<
+        HTMLButtonElement
+    > = async () => {
+        if (!user) {
+            alert(
+                "Чтобы приступитьк поиску необходимо сначала создать пользователя"
+            );
+            return;
+        }
+
+        try {
+            const response = await searchGame({
+                user_id: user.user_id
+            });
+
+            if (!response.ok) {
+                throw new Error("Something went wrong");
+            }
+
+            const roomId = await response.json();
+
+            navigate(`/room/${roomId}`);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     return (
         <main className="grid flex-auto grid-rows-[auto_1fr_auto] gap-y-8">
             <h1 className="text-4xl font-bold">Настройки</h1>
 
             <section className="grid place-content-center gap-y-4">
-                <Link
-                    to="/game"
+                {!user ? (
+                    <form
+                        onSubmit={onSubmitHandler}
+                        className="grid gap-y-4"
+                    >
+                        <label>
+                            <span>Введите ID пользователя</span>
+                            <input
+                                required
+                                type="number"
+                                name="userId"
+                                maxLength={12}
+                            />
+                        </label>
+
+                        <label>
+                            <span>Full name</span>
+                            <input
+                                required
+                                name="fullName"
+                                maxLength={12}
+                            />
+                        </label>
+
+                        <label>
+                            <span>User name</span>
+                            <input
+                                required
+                                name="userName"
+                                maxLength={12}
+                            />
+                        </label>
+
+                        <button>Создать пользователя</button>
+                    </form>
+                ) : null}
+
+                <button
+                    onClick={onClickHandler}
                     className="rounded-2xl bg-[#5d9948] px-6 py-4 text-2xl font-bold shadow-lg transition-colors duration-150 active:bg-[#a3d160]"
                 >
                     Играть
-                </Link>
+                </button>
 
                 <button className="flex items-center justify-center gap-x-4 rounded-2xl bg-black/30 px-6 py-4 shadow-lg transition-colors duration-150 active:bg-white/15">
                     <svg

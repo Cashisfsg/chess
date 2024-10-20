@@ -5,7 +5,7 @@ import "./index.css";
 import { RouterProvider } from "./app/providers";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-    <React.StrictMode>
-        <RouterProvider />
-    </React.StrictMode>
+    // <React.StrictMode>
+    <RouterProvider />
+    // </React.StrictMode>
 );
