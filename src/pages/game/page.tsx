@@ -41,36 +41,32 @@ export const GamePage = () => {
         };
 
         socket.onmessage = (event: MessageEvent) => {
-            console.log("Typeof event data: " + typeof event.data);
+            const response = JSON.parse(event.data);
 
-            const data = JSON.parse(event.data);
+            if (!("type" in response)) return;
 
-            console.log("Typeof data: " + typeof data);
-
-            if (!("type" in data)) return;
-
-            const { type } = data;
+            const { type } = response;
 
             switch (type) {
                 case "start":
                     {
-                        if (!("data" in data)) break;
+                        if (!("data" in response)) break;
 
-                        if (data.data === "b") {
+                        if (response.data === "b") {
                             setColor("black");
                         }
                     }
                     break;
 
                 case "move": {
-                    const { ok } = validateFen(data.data);
+                    const { ok } = validateFen(response.data);
 
                     if (!ok) {
                         alert("Invalid fen message");
                         break;
                     }
 
-                    chess.move(data.data);
+                    chess.move(response.data);
                     console.log("Move is made");
 
                     setFen(chess.fen());
@@ -78,7 +74,7 @@ export const GamePage = () => {
                 }
 
                 default:
-                    console.log(data);
+                    console.log(response);
 
                     break;
             }
@@ -206,7 +202,7 @@ export const GamePage = () => {
             <div className="flex aspect-square flex-auto items-center">
                 <Chessboard
                     areArrowsAllowed={true}
-                    boardOrientation={color}
+                    // boardOrientation={color}
                     position={fen}
                     // isDraggablePiece={() => false}
                     onPieceClick={(piece, square) => {
