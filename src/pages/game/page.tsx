@@ -40,16 +40,40 @@ export const GamePage = () => {
         };
 
         socket.onmessage = (event: MessageEvent) => {
-            const { ok } = validateFen(event.data);
+            console.log("Typeof event data: " + typeof event.data);
 
-            if (!ok) {
-                alert("Invalid fen message");
-                return;
+            const data = JSON.parse(event.data);
+
+            console.log("Typeof data: " + typeof data);
+
+            if (!("type" in data)) return;
+
+            const { type } = data;
+
+            switch (type) {
+                case "start":
+                    break;
+
+                case "move": {
+                    if (!("data" in data)) break;
+
+                    const { ok } = validateFen(data.data);
+
+                    if (!ok) {
+                        alert("Invalid fen message");
+                        break;
+                    }
+
+                    chess.move(event.data);
+                    setFen(chess.fen());
+                    break;
+                }
+
+                default:
+                    console.log(data);
+
+                    break;
             }
-
-            chess.move(event.data);
-
-            setFen(chess.fen());
         };
 
         socket.onerror = error => {
@@ -80,7 +104,7 @@ export const GamePage = () => {
 
         setFen(chess.fen());
 
-        socket?.send(chess.fen());
+        socket?.send(JSON.stringify({ type: "move", fen: chess.fen() }));
     }
 
     function onDrop(sourceSquare: Square, targetSquare: Square) {

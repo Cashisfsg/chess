@@ -6,17 +6,12 @@ interface SearchGameQueryParams {
     game_name?: string;
 }
 
-export const searchGame = async (queryParams: SearchGameQueryParams) => {
-    const response = await fetch(
-        `https://www.chesswebapp.xyz/api/v1/search?user_id=${queryParams.user_id}`
-        // undefined,
-        // {
-        //     method: "GET",
-        //     headers: {
-        //         "Content-Type": "application/json"
-        //     }
-        // }
+export const searchGame = async (
+    queryParams: SearchGameQueryParams,
+    requestOptions?: RequestInit
+) => {
+    return await fetch(
+        `https://www.chesswebapp.xyz/api/v1/search?user_id=${queryParams.user_id}`,
+        requestOptions
     );
-
-    return response;
 };
