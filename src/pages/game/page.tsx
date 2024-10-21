@@ -56,7 +56,7 @@ export const GamePage = () => {
                     {
                         if (!("data" in data)) break;
 
-                        if (data === "b") {
+                        if (data.data === "b") {
                             setColor("black");
                         }
                     }
@@ -70,7 +70,9 @@ export const GamePage = () => {
                         break;
                     }
 
-                    chess.move(event.data);
+                    chess.move(event.data.data);
+                    console.log("Move is made");
+
                     setFen(chess.fen());
                     break;
                 }
