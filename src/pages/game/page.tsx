@@ -15,8 +15,9 @@ type Move =
       };
 
 export const GamePage = () => {
-    const chess = useMemo(() => new Chess(), []);
-    const [fen, setFen] = useState(chess.fen());
+    const [chess, setChess] = useState(new Chess());
+    // const chess = useMemo(() => new Chess(), []);
+    // const [fen, setFen] = useState(chess.fen());
     const [color, setColor] = useState<"white" | "black">("white");
 
     const params = useParams();
@@ -59,10 +60,15 @@ export const GamePage = () => {
                     break;
 
                 case "move": {
-                    chess.move(JSON.parse(response.data));
-                    console.log("Move is made");
+                    const { ok } = validateFen(response.data);
 
-                    setFen(chess.fen());
+                    if (!ok) {
+                        alert("Invalid fen: " + response.data);
+                        break;
+                    }
+
+                    setChess(new Chess(response.data));
+
                     break;
                 }
 
@@ -99,9 +105,13 @@ export const GamePage = () => {
     function makeAMove(move: Move) {
         chess.move(move);
 
-        setFen(chess.fen());
+        const newChess = new Chess(chess.fen());
 
-        socket?.send(JSON.stringify({ type: "move", data: move }));
+        setChess(newChess);
+
+        // setFen(chess.fen());
+
+        socket?.send(JSON.stringify({ type: "move", data: chess.fen() }));
     }
 
     function onDrop(sourceSquare: Square, targetSquare: Square) {
@@ -195,8 +205,8 @@ export const GamePage = () => {
             <div className="flex aspect-square flex-auto items-center">
                 <Chessboard
                     areArrowsAllowed={true}
-                    // boardOrientation={color}
-                    position={fen}
+                    boardOrientation={color}
+                    position={chess.fen()}
                     // isDraggablePiece={() => false}
                     onPieceClick={(piece, square) => {
                         const { color } = chess.get(square);
