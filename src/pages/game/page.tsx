@@ -70,7 +70,7 @@ export const GamePage = () => {
                         break;
                     }
 
-                    chess.move(event.data.data);
+                    chess.move(data.data);
                     console.log("Move is made");
 
                     setFen(chess.fen());
