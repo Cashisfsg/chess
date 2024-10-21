@@ -17,6 +17,7 @@ type Move =
 export const GamePage = () => {
     const chess = useMemo(() => new Chess(), []);
     const [fen, setFen] = useState(chess.fen());
+    const [color, setColor] = useState<"white" | "black">("white");
 
     const params = useParams();
 
@@ -52,11 +53,16 @@ export const GamePage = () => {
 
             switch (type) {
                 case "start":
+                    {
+                        if (!("data" in data)) break;
+
+                        if (data === "b") {
+                            setColor("black");
+                        }
+                    }
                     break;
 
                 case "move": {
-                    if (!("data" in data)) break;
-
                     const { ok } = validateFen(data.data);
 
                     if (!ok) {
@@ -198,7 +204,7 @@ export const GamePage = () => {
             <div className="flex aspect-square flex-auto items-center">
                 <Chessboard
                     areArrowsAllowed={true}
-                    boardOrientation="black"
+                    boardOrientation={color}
                     position={fen}
                     // isDraggablePiece={() => false}
                     onPieceClick={(piece, square) => {
