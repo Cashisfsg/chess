@@ -59,14 +59,7 @@ export const GamePage = () => {
                     break;
 
                 case "move": {
-                    const { ok } = validateFen(response.data);
-
-                    if (!ok) {
-                        alert("Invalid fen message");
-                        break;
-                    }
-
-                    chess.move(response.data);
+                    chess.move(JSON.parse(response.data));
                     console.log("Move is made");
 
                     setFen(chess.fen());
