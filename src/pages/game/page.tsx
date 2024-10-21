@@ -108,7 +108,7 @@ export const GamePage = () => {
 
         setFen(chess.fen());
 
-        socket?.send(JSON.stringify({ type: "move", data: chess.fen() }));
+        socket?.send(JSON.stringify({ type: "move", data: move }));
     }
 
     function onDrop(sourceSquare: Square, targetSquare: Square) {
