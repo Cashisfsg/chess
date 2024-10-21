@@ -74,7 +74,7 @@ export const SettingsPage = () => {
 
             const roomId = await response.json();
 
-            navigate(`/room/${roomId}`);
+            navigate(`/game/${roomId}`);
         } catch (error) {
             console.error(error);
         }
@@ -120,7 +120,16 @@ export const SettingsPage = () => {
 
                         <button>Создать пользователя</button>
                     </form>
-                ) : null}
+                ) : (
+                    <button
+                        onClick={() => {
+                            localStorage.removeItem("user");
+                            setUser(null);
+                        }}
+                    >
+                        Удалить пользователя
+                    </button>
+                )}
 
                 <button
                     onClick={onClickHandler}

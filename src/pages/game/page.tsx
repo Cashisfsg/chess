@@ -1,9 +1,9 @@
 import { useState, useEffect, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
-import { Chess, Square } from "chess.js";
+import { useParams } from "react-router-dom";
+
+import { Chess, Square, validateFen } from "chess.js";
 import { Chessboard } from "react-chessboard";
 
-import { searchGame } from "../../shared/api/endpoints";
 import { TelegramClient } from "../../shared/api/telegram/types";
 
 type Move =
@@ -18,7 +18,52 @@ export const GamePage = () => {
     const chess = useMemo(() => new Chess(), []);
     const [fen, setFen] = useState(chess.fen());
 
-    const navigate = useNavigate();
+    const params = useParams();
+
+    const socket = useMemo(() => {
+        if (!("roomId" in params)) return null;
+
+        return new WebSocket(
+            `wss://www.chesswebapp.xyz/api/v1/room/play?room_id=${params.roomId}&user_id=${JSON.parse(localStorage.getItem("user") || "{}")?.user_id}`
+        );
+    }, [params]);
+
+    const tg = (
+        window as Window & typeof globalThis & { Telegram: TelegramClient }
+    ).Telegram.WebApp;
+
+    useEffect(() => {
+        if (!socket) return;
+
+        socket.onopen = () => {
+            console.log("socket open");
+        };
+
+        socket.onmessage = (event: MessageEvent) => {
+            const { ok } = validateFen(event.data);
+
+            if (!ok) {
+                alert("Invalid fen message");
+                return;
+            }
+
+            chess.move(event.data);
+
+            setFen(chess.fen());
+        };
+
+        socket.onerror = error => {
+            console.log(error);
+        };
+
+        socket.onclose = () => {
+            console.log("socket close");
+        };
+
+        return () => {
+            socket.close(1000, "Close connection");
+        };
+    }, [chess, socket]);
 
     const [selectedPiece, setSelectedPiece] = useState<{
         square: string;
@@ -30,27 +75,12 @@ export const GamePage = () => {
         moves: []
     });
 
-    const tg = (
-        window as Window & typeof globalThis & { Telegram: TelegramClient }
-    ).Telegram.WebApp;
-
-    useEffect(() => {
-        (async () => {
-            try {
-                const response = await searchGame({
-                    user_id: "123"
-                });
-                navigate(`/room/${response}`);
-            } catch (error) {
-                console.error(error);
-            }
-        })();
-    }, [tg?.initDataUnsafe?.user?.id]);
-
     function makeAMove(move: Move) {
         chess.move(move);
 
         setFen(chess.fen());
+
+        socket?.send(chess.fen());
     }
 
     function onDrop(sourceSquare: Square, targetSquare: Square) {

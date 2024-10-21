@@ -1,23 +1,13 @@
-interface QueryParams {
-    user_id: string;
-    fullname: string;
-    username: string;
-}
+import { baseQuery } from "../../../shared/api/config";
 
-export const createNewUser = async (queryParams: QueryParams) => {
-    const searchParams = new URLSearchParams();
+import { type CreateUserRequest } from "./types";
 
-    Object.entries(queryParams).forEach(([key, value]) => {
-        searchParams.append(key, value.toString());
-    });
-
-    return await fetch(
-        `https://www.chesswebapp.xyz/api/v1/user/create?${searchParams.toString()}`,
-        {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            }
+export const createNewUser = async (body: CreateUserRequest) => {
+    return baseQuery("/user/create", undefined, {
+        method: "POST",
+        body: JSON.stringify(body),
+        headers: {
+            "Content-Type": "application/json"
         }
-    );
+    });
 };

@@ -5,14 +5,6 @@ export const baseQuery = async (
     queryParams?: SearchParams,
     requestOptions?: RequestInit
 ) => {
-    // const baseApiUrl = new URL("/api/v1");
-
-    // console.log(baseApiUrl);
-
-    // const url = new URL(endpoint, "");
-
-    // console.log(url);
-
     const searchParams = new URLSearchParams();
 
     if (queryParams) {
@@ -21,10 +13,8 @@ export const baseQuery = async (
         });
     }
 
-    console.log(searchParams.toString());
-
     return await fetch(
-        `https://chesswebapp.xyz/api/v1${endpoint}`,
+        `${import.meta.env.VITE_BASE_API_URL}${endpoint}${queryParams ? `?${searchParams.toString()}` : ""}`,
         requestOptions
     );
 };

@@ -14,7 +14,7 @@ const router = createBrowserRouter([
         element: <SettingsPage />
     },
     {
-        path: "game",
+        path: "game/:roomId",
         element: <GamePage />
     },
     {
