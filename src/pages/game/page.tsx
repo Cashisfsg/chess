@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { Chess, Square, validateFen } from "chess.js";
 import { Chessboard } from "react-chessboard";
 
-import { TelegramClient } from "../../shared/api/telegram/types";
+// import { TelegramClient } from "../../shared/api/telegram/types";
 
 type Move =
     | string
@@ -30,9 +30,9 @@ export const GamePage = () => {
         );
     }, [params]);
 
-    const tg = (
-        window as Window & typeof globalThis & { Telegram: TelegramClient }
-    ).Telegram.WebApp;
+    // const tg = (
+    //     window as Window & typeof globalThis & { Telegram: TelegramClient }
+    // ).Telegram.WebApp;
 
     useEffect(() => {
         if (!socket) return;
@@ -90,7 +90,7 @@ export const GamePage = () => {
         return () => {
             socket.close(1000, "Close connection");
         };
-    }, [chess, socket]);
+    }, [socket]);
 
     const [selectedPiece, setSelectedPiece] = useState<{
         square: string;
