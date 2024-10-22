@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
 
-import { Chess, Square, validateFen } from "chess.js";
+import { Chess, Square, validateFen, Piece } from "chess.js";
 import { Chessboard } from "react-chessboard";
 import { UserCard } from "../../entities/user";
 
@@ -230,7 +230,16 @@ export const GamePage = () => {
                         sessionStorage.getItem("color") as "black" | "white"
                     }
                     position={chess.fen()}
-                    isDraggablePiece={() => !chess.inCheck()}
+                    isDraggablePiece={({ piece }) => {
+                        return piece.startsWith(chess.turn());
+                        // const color = sessionStorage.getItem("color");
+
+                        // if (color) {
+                        //     return color.startsWith(chess.turn());
+                        // }
+
+                        // return true;
+                    }}
                     onPieceClick={(piece, square) => {
                         const { color } = chess.get(square);
 
