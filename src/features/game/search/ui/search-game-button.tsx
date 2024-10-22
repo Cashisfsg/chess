@@ -1,11 +1,14 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-// import useSWR from "swr";
+import useSWR from "swr";
 
-import { searchGame } from "../../../../shared/api/endpoints";
+// import { searchGame } from "../../../../shared/api/endpoints";
 // import {
 //     searchGame as search,
 //     searchGameCacheKey as cacheKey
 // } from "../../../../entities/game";
+import { baseQuery } from "../../../../shared/api/config";
+import { buildQueryString } from "../../../../shared/lib/utils/build-query-string";
 
 interface User {
     user_id: string;
@@ -22,15 +25,27 @@ export const SearchGameButton: React.FC<SearchGameButtonProps> = ({
     user,
     ...props
 }) => {
-    // const { data, isLoading } = useSWR(
-    //     user?.user_id ? cacheKey({ user_id: user.user_id }) : null,
-    //     search({ user_id: "1" }),
-    //     { onError: () => alert("error occured") }
-    // );
-
-    // console.log(data);
-
+    const [skipRequest, setSkipRequest] = useState(true);
     const navigate = useNavigate();
+
+    const { isLoading } = useSWR<{
+        room_id: number;
+        color: "black" | "white";
+    }>(
+        !skipRequest && user?.user_id
+            ? buildQueryString("/search", {
+                  user_id: user.user_id
+              })
+            : null,
+        baseQuery,
+        {
+            onSuccess: ({ room_id, color }) => {
+                sessionStorage.setItem("color", color);
+                navigate(`/game/${room_id}`);
+            },
+            onError: () => alert("error occured")
+        }
+    );
 
     const onClickHandler: React.MouseEventHandler<
         HTMLButtonElement
@@ -42,27 +57,12 @@ export const SearchGameButton: React.FC<SearchGameButtonProps> = ({
             return;
         }
 
-        try {
-            const response = await searchGame({
-                user_id: user.user_id
-            });
-
-            if (!response.ok) {
-                throw new Error("Something went wrong");
-            }
-
-            const { room_id, color } = await response.json();
-            sessionStorage.setItem("color", color);
-            navigate(`/game/${room_id}`);
-        } catch (error) {
-            console.error(error);
-            alert(error);
-        }
+        setSkipRequest(false);
     };
 
     return (
         <button
-            // disabled={isLoading}
+            disabled={isLoading}
             onClick={onClickHandler}
             className="flex items-center justify-center gap-x-4 rounded-2xl bg-[#5d9948] px-6 py-4 text-2xl font-bold shadow-lg transition-colors duration-150 active:bg-[#a3d160] disabled:opacity-50"
             {...props}

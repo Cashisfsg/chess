@@ -8,8 +8,8 @@ interface SearchGameQueryParams {
 
 const endpoint = "/search";
 
-export const searchGame = (params: SearchGameQueryParams) => {
-    return baseQuery(endpoint, params);
+export const searchGame = (endpoint: string) => {
+    return baseQuery(endpoint);
 };
 
 export const searchGameCacheKey = (queryParams: SearchGameQueryParams) => {

@@ -3,8 +3,7 @@ import { useParams } from "react-router-dom";
 
 import { Chess, Square, validateFen } from "chess.js";
 import { Chessboard } from "react-chessboard";
-
-// import { TelegramClient } from "../../shared/api/telegram/types";
+import { UserCard } from "../../entities/user";
 
 const sendWinner = async ({
     roomId,
@@ -179,34 +178,6 @@ export const GamePage = () => {
         }
     }
 
-    // const selectAvailableSquares = (
-    //     availableMoves: string[]
-    // ): HTMLElement[] => {
-    //     if (availableMoves.length === 0) return [];
-
-    //     try {
-    //         return Array.from(
-    //             document.querySelectorAll(
-    //                 availableMoves
-    //                     .map(square => {
-    //                         const regex = new RegExp("^[a-hBKNRQ]x[a-h][1-8]$");
-
-    //                         if (regex.test(square)) {
-    //                             return `[data-square=${square.substring(2)}]`;
-    //                         } else {
-    //                             return `[data-square=${
-    //                                 square.match(/[a-hBKNRQ][1-8]/)?.[0]
-    //                             }]`;
-    //                         }
-    //                     })
-    //                     .join(", ")
-    //             )
-    //         );
-    //     } catch (error) {
-    //         return [];
-    //     }
-    // };
-
     const highlightSquares = (
         pieceSquare: string,
         availableMoves: string[]
@@ -248,7 +219,10 @@ export const GamePage = () => {
 
     return (
         <main className="flex max-h-full flex-auto basis-full flex-col gap-y-8">
-            <p>Player 1</p>
+            <UserCard
+                id={"538945734"}
+                color="black"
+            />
             <div className="flex aspect-square flex-auto items-center">
                 <Chessboard
                     areArrowsAllowed={true}
@@ -326,7 +300,10 @@ export const GamePage = () => {
                     onPieceDrop={onDrop}
                 />
             </div>
-            <p>Player 2</p>
+            <UserCard
+                id={"sdf4234"}
+                color="white"
+            />
         </main>
     );
 };
