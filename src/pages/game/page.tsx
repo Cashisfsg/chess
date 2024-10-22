@@ -54,7 +54,7 @@ const checkMateCheck = (chess: Chess, roomId: number) => {
             } else {
                 alert("Black win");
             }
-        }, 300);
+        }, 2000);
     }
 };
 
