@@ -16,9 +16,6 @@ type Move =
 
 export const GamePage = () => {
     const [chess, setChess] = useState(new Chess());
-    // const chess = useMemo(() => new Chess(), []);
-    // const [fen, setFen] = useState(chess.fen());
-    const [color, setColor] = useState<"white" | "black">("white");
 
     const params = useParams();
 
@@ -49,16 +46,6 @@ export const GamePage = () => {
             const { type } = response;
 
             switch (type) {
-                case "start":
-                    {
-                        if (!("data" in response)) break;
-
-                        if (response.data === "b") {
-                            setColor("black");
-                        }
-                    }
-                    break;
-
                 case "move": {
                     const { ok } = validateFen(response.data);
 
@@ -105,11 +92,7 @@ export const GamePage = () => {
     function makeAMove(move: Move) {
         chess.move(move);
 
-        const newChess = new Chess(chess.fen());
-
-        setChess(newChess);
-
-        // setFen(chess.fen());
+        setChess(new Chess(chess.fen()));
 
         socket?.send(JSON.stringify({ type: "move", data: chess.fen() }));
     }
@@ -205,9 +188,19 @@ export const GamePage = () => {
             <div className="flex aspect-square flex-auto items-center">
                 <Chessboard
                     areArrowsAllowed={true}
-                    boardOrientation={color}
+                    boardOrientation={
+                        sessionStorage.getItem("color") as "black" | "white"
+                    }
                     position={chess.fen()}
-                    // isDraggablePiece={() => false}
+                    isDraggablePiece={() => {
+                        const color = sessionStorage.getItem("color");
+
+                        if (color) {
+                            return color.startsWith(chess.turn());
+                        }
+
+                        return true;
+                    }}
                     onPieceClick={(piece, square) => {
                         const { color } = chess.get(square);
 
@@ -259,7 +252,6 @@ export const GamePage = () => {
                     onPieceDragBegin={(piece, square) => {
                         const { color } = chess.get(square);
 
-                        // Проверка если текущая фигура не принадлежит игроку ничего не делать
                         if (chess.turn() !== color) return;
 
                         const availableMoves = chess.moves({ square });
