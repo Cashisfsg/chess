@@ -13,31 +13,35 @@ const sendWinner = async ({
     roomId: number;
     color: "w" | "b";
 }) => {
-    const winner = {
-        w: "white",
-        b: "black"
-    };
+    try {
+        const winner = {
+            w: "white",
+            b: "black"
+        };
 
-    const response = await fetch(
-        import.meta.env.VITE_BASE_API_URL + "/room/play/winner",
-        {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                room_id: roomId,
-                winner_color: winner[color]
-            })
+        const response = await fetch(
+            import.meta.env.VITE_BASE_API_URL + "/room/play/winner",
+            {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    room_id: roomId,
+                    winner_color: winner[color]
+                })
+            }
+        );
+
+        if (!response.ok) {
+            const message = await response.json();
+            throw new Error(message);
         }
-    );
 
-    if (!response.ok) {
-        const message = await response.json();
-        throw new Error(message);
+        return await response.json();
+    } catch (error) {
+        alert((error as Error).message);
     }
-
-    return await response.json();
 };
 
 const checkMateCheck = (chess: Chess, roomId: number) => {
