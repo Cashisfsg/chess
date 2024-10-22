@@ -230,15 +230,7 @@ export const GamePage = () => {
                         sessionStorage.getItem("color") as "black" | "white"
                     }
                     position={chess.fen()}
-                    isDraggablePiece={() => {
-                        const color = sessionStorage.getItem("color");
-
-                        if (color) {
-                            return color.startsWith(chess.turn());
-                        }
-
-                        return true;
-                    }}
+                    isDraggablePiece={() => !chess.inCheck()}
                     onPieceClick={(piece, square) => {
                         const { color } = chess.get(square);
 
