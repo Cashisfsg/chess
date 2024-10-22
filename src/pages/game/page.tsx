@@ -6,6 +6,10 @@ import { Chessboard } from "react-chessboard";
 
 // import { TelegramClient } from "../../shared/api/telegram/types";
 
+const sendWinner = async () => {
+    const response = await fetch(import.meta.env.VITE_BASE_API_URL + "");
+};
+
 const checkMateCheck = (chess: Chess) => {
     if (!chess.isGameOver()) return;
 
@@ -108,7 +112,7 @@ export const GamePage = () => {
 
         const newChess = new Chess(chess.fen());
 
-        setChess(new Chess());
+        setChess(newChess);
 
         checkMateCheck(newChess);
 
