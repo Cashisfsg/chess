@@ -6,6 +6,16 @@ import { Chessboard } from "react-chessboard";
 
 // import { TelegramClient } from "../../shared/api/telegram/types";
 
+const checkMateCheck = (chess: Chess) => {
+    if (!chess.isGameOver()) return;
+
+    if (chess.isCheckmate()) {
+        const loser = chess.turn();
+
+        loser === "b" ? alert("White win") : alert("Black win");
+    }
+};
+
 type Move =
     | string
     | {
@@ -54,7 +64,11 @@ export const GamePage = () => {
                         break;
                     }
 
-                    setChess(new Chess(response.data));
+                    const newChess = new Chess(response.data);
+
+                    setChess(newChess);
+
+                    checkMateCheck(newChess);
 
                     break;
                 }
@@ -92,7 +106,11 @@ export const GamePage = () => {
     function makeAMove(move: Move) {
         chess.move(move);
 
-        setChess(new Chess(chess.fen()));
+        const newChess = new Chess(chess.fen());
+
+        setChess(new Chess());
+
+        checkMateCheck(newChess);
 
         socket?.send(JSON.stringify({ type: "move", data: chess.fen() }));
     }
