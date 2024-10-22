@@ -6,17 +6,55 @@ import { Chessboard } from "react-chessboard";
 
 // import { TelegramClient } from "../../shared/api/telegram/types";
 
-const sendWinner = async () => {
-    const response = await fetch(import.meta.env.VITE_BASE_API_URL + "");
+const sendWinner = async ({
+    roomId,
+    color
+}: {
+    roomId: number;
+    color: "w" | "b";
+}) => {
+    const winner = {
+        w: "white",
+        b: "black"
+    };
+
+    const response = await fetch(
+        import.meta.env.VITE_BASE_API_URL + "/room/play/winner",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                room_id: roomId,
+                winner_color: winner[color]
+            })
+        }
+    );
+
+    if (!response.ok) {
+        const message = await response.json();
+        throw new Error(message);
+    }
+
+    return await response.json();
 };
 
-const checkMateCheck = (chess: Chess) => {
+const checkMateCheck = (chess: Chess, roomId: number) => {
     if (!chess.isGameOver()) return;
 
     if (chess.isCheckmate()) {
-        const loser = chess.turn();
+        setTimeout(async () => {
+            const loser = chess.turn();
 
-        loser === "b" ? alert("White win") : alert("Black win");
+            await sendWinner({ roomId, color: loser });
+
+            if (loser === "b") {
+                alert("white win");
+            } else {
+                alert("Black win");
+            }
+        }, 300);
     }
 };
 
@@ -72,7 +110,7 @@ export const GamePage = () => {
 
                     setChess(newChess);
 
-                    checkMateCheck(newChess);
+                    checkMateCheck(newChess, parseInt(params?.roomId || "0"));
 
                     break;
                 }
@@ -114,7 +152,7 @@ export const GamePage = () => {
 
         setChess(newChess);
 
-        checkMateCheck(newChess);
+        checkMateCheck(newChess, parseInt(params?.roomId || "0"));
 
         socket?.send(JSON.stringify({ type: "move", data: chess.fen() }));
     }
