@@ -1,9 +1,11 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
 
-import { Chess, Square, validateFen, Piece } from "chess.js";
+import { Chess, Square, validateFen } from "chess.js";
 import { Chessboard } from "react-chessboard";
-import { UserCard } from "../../entities/user";
+
+import { useWebSocketContext } from "@/app/providers/web-socket/use-web-socket-context";
+import { UserCard } from "@/entities/user";
 
 const sendWinner = async ({
     roomId,

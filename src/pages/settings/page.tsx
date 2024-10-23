@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { createNewUser } from "../../entities/user/api/create-user";
 
-import { SearchGameButton } from "../../features/game/search";
+import { SearchGameButton } from "@/features/game/search";
+import { createNewUser } from "@/entities/user/api/create-user";
 
 interface FormFields {
     userId: HTMLInputElement;

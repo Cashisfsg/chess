@@ -1,8 +1,8 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { WelcomePage } from "../../pages/welcome";
-import { SettingsPage } from "../../pages/settings/page";
-import { GamePage } from "../../pages/game";
-import { RoomPage } from "../../pages/room/page";
+import { WelcomePage } from "@/pages/welcome";
+import { SettingsPage } from "@/pages/settings/page";
+import { GamePage } from "@/pages/game";
+import { RoomPage } from "@/pages/room/page";
 
 const router = createBrowserRouter([
     {

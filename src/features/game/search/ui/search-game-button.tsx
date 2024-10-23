@@ -2,13 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useSWR from "swr";
 
-// import { searchGame } from "../../../../shared/api/endpoints";
-// import {
-//     searchGame as search,
-//     searchGameCacheKey as cacheKey
-// } from "../../../../entities/game";
-import { baseQuery } from "../../../../shared/api/config";
-import { buildQueryString } from "../../../../shared/lib/utils/build-query-string";
+import { baseQuery } from "@/shared/api/config";
+import { buildQueryString } from "@/shared/lib/utils/build-query-string";
 
 interface User {
     user_id: string;
