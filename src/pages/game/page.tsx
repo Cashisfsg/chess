@@ -231,14 +231,16 @@ export const GamePage = () => {
                     }
                     position={chess.fen()}
                     isDraggablePiece={({ piece }) => {
+                        const color = sessionStorage.getItem("color");
+
+                        if (color) {
+                            return (
+                                color.startsWith(chess.turn()) &&
+                                piece.startsWith(chess.turn())
+                            );
+                        }
+
                         return piece.startsWith(chess.turn());
-                        // const color = sessionStorage.getItem("color");
-
-                        // if (color) {
-                        //     return color.startsWith(chess.turn());
-                        // }
-
-                        // return true;
                     }}
                     onPieceClick={(piece, square) => {
                         const { color } = chess.get(square);
