@@ -12,6 +12,8 @@ export const Provider: React.FC<ProviderProps> = ({ children }) => {
 
     const connect = useCallback(
         ({ roomId, userId }: WSConnectionProperties) => {
+            console.log("Web socket try to connect");
+
             setSocket(
                 new WebSocket(
                     `wss://www.chesswebapp.xyz/api/v1/play?room_id=${roomId}&user_id=${userId}`

@@ -90,7 +90,10 @@ export const GamePage = () => {
     // ).Telegram.WebApp;
 
     useEffect(() => {
-        if (!("roomId" in params) || !params.roomId) return;
+        console.log("Params: ");
+        console.log(params);
+
+        if (!("roomId" in params) || !params?.roomId) return;
 
         const stored = localStorage.getItem("user");
 
@@ -98,10 +101,13 @@ export const GamePage = () => {
 
         const user = JSON.parse(stored);
 
-        if (!("userId" in user) || !user.userId) return;
+        console.log("User");
+        console.log(user);
+
+        if (!("user_id" in user) || !user.user_id) return;
 
         const { roomId } = params;
-        const { userId } = user;
+        const { user_id: userId } = user;
 
         connect({ roomId, userId });
 
@@ -133,7 +139,9 @@ export const GamePage = () => {
 
                     setChess(newChess);
 
-                    checkMateCheck(newChess, parseInt(params?.roomId || "0"));
+                    if (!("roomId" in params) || !params.roomId) return;
+
+                    checkMateCheck(newChess, parseInt(params.roomId));
 
                     break;
                 }
@@ -144,7 +152,7 @@ export const GamePage = () => {
                     break;
             }
         };
-    }, [socket]);
+    }, [socket, params?.roomId]);
 
     const [selectedPiece, setSelectedPiece] = useState<{
         square: string;
@@ -177,7 +185,13 @@ export const GamePage = () => {
             });
 
             if (chess.isGameOver()) {
-                alert("Game over");
+                const color = sessionStorage.getItem("color");
+
+                if (!color) return false;
+
+                socket?.send(
+                    JSON.stringify({ type: "checkmate", winner: color })
+                );
             }
 
             return true;

@@ -42,9 +42,8 @@ export const SettingsPage = () => {
 
             const response = await createNewUser(newUser);
 
-            if (!response.ok) {
-                throw new Error("Something went wrong");
-            }
+            console.log("User response: ");
+            console.log(response);
 
             localStorage.setItem("user", JSON.stringify(newUser));
             setUser(newUser);

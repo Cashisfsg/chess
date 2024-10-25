@@ -18,6 +18,9 @@ export const GameOverDialog = () => {
 
             const { type, data } = response;
 
+            console.log("Socket response: ");
+            console.log(response);
+
             if (type !== "game-over" || !("reason" in data)) return;
 
             const { reason } = data;
