@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useSWR from "swr";
 
 import { baseQuery } from "@/shared/api/config";
 import { buildQueryString } from "@/shared/lib/utils/build-query-string";
+import { composeEventHandlers } from "@/shared/lib/utils/compose-event-handlers";
 
 interface User {
     user_id: string;
@@ -12,18 +13,28 @@ interface User {
 }
 
 interface SearchGameButtonProps
-    extends React.ComponentPropsWithoutRef<"button"> {
-    user: User | null;
-}
+    extends React.ComponentPropsWithoutRef<"button"> {}
 
 export const SearchGameButton: React.FC<SearchGameButtonProps> = ({
-    user,
+    onClick,
     ...props
 }) => {
     const [skipRequest, setSkipRequest] = useState(true);
     const navigate = useNavigate();
 
-    const { isLoading } = useSWR<{
+    const user = useMemo(() => {
+        const data = localStorage.getItem("user");
+
+        if (!data) return null;
+
+        const user: User = JSON.parse(data);
+
+        if (!("user_id" in user)) return null;
+
+        return user;
+    }, []);
+
+    const { isLoading, mutate } = useSWR<{
         room_id: number;
         color: "black" | "white";
     }>(
@@ -34,11 +45,14 @@ export const SearchGameButton: React.FC<SearchGameButtonProps> = ({
             : null,
         baseQuery,
         {
+            errorRetryCount: 0,
+            revalidateOnFocus: false,
+            refreshInterval: 0,
             onSuccess: ({ room_id, color }) => {
                 sessionStorage.setItem("color", color);
                 navigate(`/game/${room_id}`);
             },
-            onError: () => alert("error occured")
+            onError: error => console.error(error)
         }
     );
 
@@ -52,14 +66,19 @@ export const SearchGameButton: React.FC<SearchGameButtonProps> = ({
             return;
         }
 
-        setSkipRequest(false);
+        if (skipRequest) {
+            setSkipRequest(false);
+            return;
+        }
+
+        mutate(undefined, { revalidate: true });
     };
 
     return (
         <button
             disabled={isLoading}
-            onClick={onClickHandler}
-            className="flex items-center justify-center gap-x-4 rounded-2xl bg-[#5d9948] px-6 py-4 text-2xl font-bold shadow-lg transition-colors duration-150 active:bg-[#a3d160] disabled:opacity-50"
+            onClick={composeEventHandlers(onClick, onClickHandler)}
+            className="flex items-center justify-center gap-x-4 rounded-2xl bg-[#5d9948] px-6 py-4 text-2xl font-bold text-white shadow-lg transition-colors duration-150 active:bg-[#a3d160] disabled:opacity-50"
             {...props}
         >
             <svg

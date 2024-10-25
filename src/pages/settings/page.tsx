@@ -40,10 +40,7 @@ export const SettingsPage = () => {
                 username: userName.value
             };
 
-            const response = await createNewUser(newUser);
-
-            console.log("User response: ");
-            console.log(response);
+            await createNewUser(newUser);
 
             localStorage.setItem("user", JSON.stringify(newUser));
             setUser(newUser);
@@ -103,7 +100,7 @@ export const SettingsPage = () => {
                     </button>
                 )}
 
-                <SearchGameButton user={user} />
+                <SearchGameButton />
 
                 <button className="flex items-center justify-center gap-x-4 rounded-2xl bg-black/30 px-6 py-4 shadow-lg transition-colors duration-150 active:bg-white/15">
                     <svg

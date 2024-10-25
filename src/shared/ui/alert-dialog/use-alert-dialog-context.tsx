@@ -4,7 +4,7 @@ export const AlertDialogContext = createContext<{
     alertDialogId: string;
     alertDialogLabelId: string;
     alertDialogDescriptionId: string;
-    alertDialogRef: React.RefObject<HTMLDivElement>;
+    alertDialogRef: React.RefObject<HTMLDialogElement>;
 } | null>(null);
 
 export const useAlertDialogContext = () => {

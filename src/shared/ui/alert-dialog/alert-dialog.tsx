@@ -4,6 +4,7 @@ import {
     useAlertDialogContext
 } from "./use-alert-dialog-context";
 import { composeRefs } from "@/shared/lib/utils/compose-refs";
+import { composeEventHandlers } from "@/shared/lib/utils/compose-event-handlers";
 
 interface RootProps extends React.PropsWithChildren {}
 
@@ -11,7 +12,7 @@ export const Root: React.FC<RootProps> = ({ children }) => {
     const alertDialogId = `alert-dialog-${useId()}`;
     const alertDialogLabelId = `alert-dialog-label-${useId()}`;
     const alertDialogDescriptionId = `alert-dialog-description-${useId()}`;
-    const alertDialogRef = useRef<HTMLDivElement>(null);
+    const alertDialogRef = useRef<HTMLDialogElement>(null);
 
     const context = useMemo(
         () => ({
@@ -34,15 +35,15 @@ Root.displayName = "AlertDialog.Root";
 
 interface ContentProps
     extends Omit<
-        React.ComponentPropsWithoutRef<"div">,
+        React.ComponentPropsWithoutRef<"dialog">,
         | "id"
         | "role"
-        | "aria-modal"
-        | "popover"
+        // | "aria-modal"
+        // | "popover"
         | "aria-labelledby"
         | "aria-describedby"
     > {
-    forwardRef?: React.RefObject<HTMLDivElement>;
+    forwardRef?: React.RefObject<HTMLDialogElement>;
 }
 
 export const Content: React.FC<ContentProps> = ({ forwardRef, ...props }) => {
@@ -54,12 +55,11 @@ export const Content: React.FC<ContentProps> = ({ forwardRef, ...props }) => {
     } = useAlertDialogContext();
 
     return (
-        <div
+        <dialog
             {...props}
             id={alertDialogId}
             role="alertdialog"
-            popover="auto"
-            aria-modal="true"
+            // aria-modal="true"
             aria-labelledby={alertDialogLabelId}
             aria-describedby={alertDialogDescriptionId}
             ref={composeRefs(forwardRef, alertDialogRef)}
@@ -102,15 +102,22 @@ Description.displayName = "AlertDialog.Description";
 
 interface CloseProps extends React.ComponentPropsWithoutRef<"button"> {}
 
-export const Close: React.FC<CloseProps> = ({ type = "button", ...props }) => {
-    const { alertDialogId } = useAlertDialogContext();
+export const Close: React.FC<CloseProps> = ({
+    type = "button",
+    onClick,
+    ...props
+}) => {
+    const { alertDialogRef } = useAlertDialogContext();
+
+    const onClickHandler = () => {
+        alertDialogRef.current?.close();
+    };
 
     return (
         <button
             {...props}
             type={type}
-            popovertarget={alertDialogId}
-            popovertargetaction="hide"
+            onClick={composeEventHandlers(onClick, onClickHandler)}
         />
     );
 };

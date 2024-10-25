@@ -7,60 +7,62 @@ import { Chessboard } from "react-chessboard";
 import { useWebSocketContext } from "@/app/providers/web-socket/use-web-socket-context";
 import { UserCard } from "@/entities/user";
 
-const sendWinner = async ({
-    roomId,
-    color
-}: {
-    roomId: number;
-    color: "w" | "b";
-}) => {
-    try {
-        const winner = {
-            w: "white",
-            b: "black"
-        };
+import { GameOverDialog } from "@/widgets/game-over-dialog";
 
-        const response = await fetch(
-            import.meta.env.VITE_BASE_API_URL + "/room/play/winner",
-            {
-                method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    room_id: roomId,
-                    winner_color: winner[color]
-                })
-            }
-        );
+// const sendWinner = async ({
+//     roomId,
+//     color
+// }: {
+//     roomId: number;
+//     color: "w" | "b";
+// }) => {
+//     try {
+//         const winner = {
+//             w: "white",
+//             b: "black"
+//         };
 
-        if (!response.ok) {
-            const message = await response.json();
-            throw new Error(message);
-        }
+//         const response = await fetch(
+//             import.meta.env.VITE_BASE_API_URL + "/room/play/winner",
+//             {
+//                 method: "PATCH",
+//                 headers: {
+//                     "Content-Type": "application/json"
+//                 },
+//                 body: JSON.stringify({
+//                     room_id: roomId,
+//                     winner_color: winner[color]
+//                 })
+//             }
+//         );
 
-        return await response.json();
-    } catch (error) {
-        alert((error as Error).message);
-    }
-};
+//         if (!response.ok) {
+//             const message = await response.json();
+//             throw new Error(message);
+//         }
+
+//         return await response.json();
+//     } catch (error) {
+//         alert((error as Error).message);
+//     }
+// };
 
 const checkMateCheck = (chess: Chess, roomId: number) => {
     if (!chess.isGameOver()) return;
 
-    if (chess.isCheckmate()) {
-        setTimeout(async () => {
-            const loser = chess.turn();
+    // if (chess.isCheckmate()) {
+    //     setTimeout(async () => {
+    //         const loser = chess.turn();
 
-            await sendWinner({ roomId, color: loser });
+    //         await sendWinner({ roomId, color: loser });
 
-            if (loser === "b") {
-                alert("white win");
-            } else {
-                alert("Black win");
-            }
-        }, 2000);
-    }
+    //         if (loser === "b") {
+    //             alert("white win");
+    //         } else {
+    //             alert("Black win");
+    //         }
+    //     }, 2000);
+    // }
 };
 
 type Move =
@@ -329,6 +331,7 @@ export const GamePage = () => {
                 id={"sdf4234"}
                 color="white"
             />
+            <GameOverDialog />
         </main>
     );
 };
