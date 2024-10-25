@@ -14,7 +14,7 @@ export const Provider: React.FC<ProviderProps> = ({ children }) => {
         ({ roomId, userId }: WSConnectionProperties) => {
             setSocket(
                 new WebSocket(
-                    `wss://www.chesswebapp.xyz/api/v1/room/play?room_id=${roomId}&user_id=${userId}`
+                    `wss://www.chesswebapp.xyz/api/v1/play?room_id=${roomId}&user_id=${userId}`
                 )
             );
         },

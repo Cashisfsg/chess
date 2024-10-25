@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 
 import { Chess, Square, validateFen } from "chess.js";
@@ -75,25 +75,43 @@ export const GamePage = () => {
     const [chess, setChess] = useState(new Chess());
 
     const params = useParams();
+    const { socket, connect, disconnect } = useWebSocketContext();
 
-    const socket = useMemo(() => {
-        if (!("roomId" in params)) return null;
+    // const socket = useMemo(() => {
+    //     if (!("roomId" in params)) return null;
 
-        return new WebSocket(
-            `wss://www.chesswebapp.xyz/api/v1/room/play?room_id=${params.roomId}&user_id=${JSON.parse(localStorage.getItem("user") || "{}")?.user_id}`
-        );
-    }, [params]);
+    //     return new WebSocket(
+    //         `wss://www.chesswebapp.xyz/api/v1/room/play?room_id=${params.roomId}&user_id=${JSON.parse(localStorage.getItem("user") || "{}")?.user_id}`
+    //     );
+    // }, [params]);
 
     // const tg = (
     //     window as Window & typeof globalThis & { Telegram: TelegramClient }
     // ).Telegram.WebApp;
 
     useEffect(() => {
-        if (!socket) return;
+        if (!("roomId" in params) || !params.roomId) return;
 
-        socket.onopen = () => {
-            console.log("socket open");
+        const stored = localStorage.getItem("user");
+
+        if (!stored) return;
+
+        const user = JSON.parse(stored);
+
+        if (!("userId" in user) || !user.userId) return;
+
+        const { roomId } = params;
+        const { userId } = user;
+
+        connect({ roomId, userId });
+
+        return () => {
+            disconnect();
         };
+    }, [params]);
+
+    useEffect(() => {
+        if (!socket) return;
 
         socket.onmessage = (event: MessageEvent) => {
             const response = JSON.parse(event.data);
@@ -125,18 +143,6 @@ export const GamePage = () => {
 
                     break;
             }
-        };
-
-        socket.onerror = error => {
-            console.log(error);
-        };
-
-        socket.onclose = () => {
-            console.log("socket close");
-        };
-
-        return () => {
-            socket.close(1000, "Close connection");
         };
     }, [socket]);
 

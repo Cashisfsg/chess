@@ -2,11 +2,11 @@ import { baseQuery } from "../../../shared/api/config";
 
 import { type CreateUserRequest } from "./types";
 
-export const createNewUser = async (
+export const createNewUser = (
     body: CreateUserRequest,
     requestOptions?: RequestInit
 ) => {
-    return baseQuery("/user/create", undefined, {
+    return baseQuery("/user/create", {
         method: "POST",
         body: JSON.stringify(body),
         headers: {
