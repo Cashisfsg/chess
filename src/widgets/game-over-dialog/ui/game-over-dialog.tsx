@@ -25,6 +25,8 @@ export const GameOverDialog = () => {
             const { reason } = data;
 
             if (reason === "checkmate") {
+                console.log("Show modal");
+
                 dialogRef.current?.showModal();
                 setWinner(data.winner);
             }
@@ -35,7 +37,7 @@ export const GameOverDialog = () => {
         <AlertDialog.Root>
             <AlertDialog.Content
                 forwardRef={dialogRef}
-                className="flex flex-col gap-y-4 rounded-2xl bg-black p-4"
+                className="fixed inset-0 my-auto flex-col gap-y-4 overflow-hidden rounded-2xl bg-black p-4 open:flex"
             >
                 <AlertDialog.Label className="-mx-4 -mt-4 bg-[#1f1f1f] py-4 text-2xl font-bold text-white">
                     Мат
