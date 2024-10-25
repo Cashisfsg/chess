@@ -133,7 +133,7 @@ export const GamePage = () => {
                     const { ok } = validateFen(response.data);
 
                     if (!ok) {
-                        alert("Invalid fen: " + response.data);
+                        console.error("Invalid fen: " + response.data);
                         break;
                     }
 
@@ -154,7 +154,7 @@ export const GamePage = () => {
                     break;
             }
         };
-    }, [socket, params?.roomId]);
+    }, [socket, params]);
 
     const [selectedPiece, setSelectedPiece] = useState<{
         square: string;
@@ -267,6 +267,17 @@ export const GamePage = () => {
                         return piece.startsWith(chess.turn());
                     }}
                     onPieceClick={(piece, square) => {
+                        const boardOrientation =
+                            sessionStorage.getItem("color");
+
+                        if (!boardOrientation) return;
+
+                        if (
+                            !boardOrientation.startsWith(chess.turn()) ||
+                            !boardOrientation.startsWith(chess.turn())
+                        )
+                            return;
+
                         const { color } = chess.get(square);
 
                         if (chess.turn() !== color) return;
