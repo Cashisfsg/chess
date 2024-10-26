@@ -121,7 +121,7 @@ export const GamePage = () => {
     useEffect(() => {
         if (!socket) return;
 
-        socket.onmessage = (event: MessageEvent) => {
+        socket.addEventListener("message", (event: MessageEvent) => {
             const response = JSON.parse(event.data);
 
             if (!("type" in response)) return;
@@ -149,11 +149,9 @@ export const GamePage = () => {
                 }
 
                 default:
-                    console.log(response);
-
                     break;
             }
-        };
+        });
     }, [socket, params]);
 
     const [selectedPiece, setSelectedPiece] = useState<{
@@ -176,6 +174,25 @@ export const GamePage = () => {
         checkMateCheck(newChess, parseInt(params?.roomId || "0"));
 
         socket?.send(JSON.stringify({ type: "move", data: chess.fen() }));
+
+        if (chess.isGameOver()) {
+            const color = sessionStorage.getItem("color");
+
+            if (!color)
+                throw Error(
+                    "Board orientation does not exist in session storage"
+                );
+
+            socket?.send(JSON.stringify({ type: "checkmate", winner: color }));
+        }
+
+        if (chess.isDraw()) {
+            socket?.send(JSON.stringify({ type: "draw", detail: "draw" }));
+        }
+
+        if (chess.moves().length === 0) {
+            socket?.send(JSON.stringify({ type: "draw", detail: "stalemate" }));
+        }
     }
 
     function onDrop(sourceSquare: Square, targetSquare: Square) {
@@ -185,16 +202,6 @@ export const GamePage = () => {
                 to: targetSquare,
                 promotion: "q" // always promote to a queen for example simplicity
             });
-
-            if (chess.isGameOver()) {
-                const color = sessionStorage.getItem("color");
-
-                if (!color) return false;
-
-                socket?.send(
-                    JSON.stringify({ type: "checkmate", winner: color })
-                );
-            }
 
             return true;
         } catch (error) {
@@ -302,8 +309,6 @@ export const GamePage = () => {
                                 piece !== undefined &&
                                 piece.startsWith(selectedPiece.color))
                         ) {
-                            console.log(square, piece);
-
                             return;
                         }
 
@@ -314,7 +319,7 @@ export const GamePage = () => {
                                 promotion: "q" // always promote to a queen for example simplicity
                             });
                         } catch (error) {
-                            console.log("Invalid move");
+                            console.error("Invalid move");
                         } finally {
                             setSelectedPiece(piece => ({
                                 ...piece,

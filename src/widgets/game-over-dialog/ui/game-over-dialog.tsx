@@ -6,7 +6,10 @@ import { useWebSocketContext } from "@/app/providers/web-socket/use-web-socket-c
 import { AlertDialog } from "@/shared/ui/alert-dialog";
 
 export const GameOverDialog = () => {
-    const [winner, setWinner] = useState<"black" | "white" | null>(null);
+    const [details, setDetails] = useState<{
+        label: string;
+        description: string;
+    }>({ label: "", description: "" });
     const dialogRef = useRef<HTMLDialogElement>(null);
     const { socket } = useWebSocketContext();
 
@@ -24,12 +27,38 @@ export const GameOverDialog = () => {
 
             const { reason } = data;
 
-            if (reason === "checkmate") {
-                console.log("Show modal");
+            switch (reason) {
+                case "checkmate": {
+                    if (!("winner" in data)) break;
 
-                dialogRef.current?.showModal();
-                setWinner(data.winner);
+                    const { winner } = data;
+
+                    setDetails({
+                        label: "Мат",
+                        description: `Победили ${winner === "black" ? "черные" : "белые"}`
+                    });
+
+                    break;
+                }
+
+                case "stalemate":
+                    setDetails({ label: "Ничья", description: "Пат" });
+
+                    break;
+
+                case "draw":
+                    setDetails({
+                        label: "Ничья",
+                        description: "Победила дружба"
+                    });
+
+                    break;
+
+                default:
+                    break;
             }
+
+            dialogRef.current?.showModal();
         });
     }, [socket]);
 
@@ -40,10 +69,10 @@ export const GameOverDialog = () => {
                 className="fixed inset-0 my-auto flex-col gap-y-4 overflow-hidden rounded-2xl bg-black p-4 open:flex"
             >
                 <AlertDialog.Label className="-mx-4 -mt-4 bg-[#1f1f1f] py-4 text-2xl font-bold text-white">
-                    Мат
+                    {details.label}
                 </AlertDialog.Label>
                 <AlertDialog.Description className="text-lg font-bold text-white">
-                    Победили {winner === "white" ? "белые" : "черные"}
+                    {details.description}
                 </AlertDialog.Description>
                 <Link
                     to="/settings"

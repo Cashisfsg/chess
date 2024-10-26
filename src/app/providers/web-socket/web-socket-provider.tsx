@@ -44,7 +44,7 @@ export const Provider: React.FC<ProviderProps> = ({ children }) => {
         };
 
         socket.onerror = error => {
-            console.log(error);
+            console.error(error);
         };
 
         socket.onclose = () => {
