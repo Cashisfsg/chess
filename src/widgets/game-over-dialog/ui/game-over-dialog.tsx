@@ -5,11 +5,16 @@ import { useWebSocketContext } from "@/app/providers/web-socket/use-web-socket-c
 
 import { AlertDialog } from "@/shared/ui/alert-dialog";
 
+interface PartyDetails {
+    label: string;
+    description: string;
+}
+
 export const GameOverDialog = () => {
-    const [details, setDetails] = useState<{
-        label: string;
-        description: string;
-    }>({ label: "", description: "" });
+    const [details, setDetails] = useState<PartyDetails>({
+        label: "",
+        description: ""
+    });
     const dialogRef = useRef<HTMLDialogElement>(null);
     const { socket } = useWebSocketContext();
 

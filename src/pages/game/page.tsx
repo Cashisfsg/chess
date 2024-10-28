@@ -9,62 +9,6 @@ import { UserCard } from "@/entities/user";
 
 import { GameOverDialog } from "@/widgets/game-over-dialog";
 
-// const sendWinner = async ({
-//     roomId,
-//     color
-// }: {
-//     roomId: number;
-//     color: "w" | "b";
-// }) => {
-//     try {
-//         const winner = {
-//             w: "white",
-//             b: "black"
-//         };
-
-//         const response = await fetch(
-//             import.meta.env.VITE_BASE_API_URL + "/room/play/winner",
-//             {
-//                 method: "PATCH",
-//                 headers: {
-//                     "Content-Type": "application/json"
-//                 },
-//                 body: JSON.stringify({
-//                     room_id: roomId,
-//                     winner_color: winner[color]
-//                 })
-//             }
-//         );
-
-//         if (!response.ok) {
-//             const message = await response.json();
-//             throw new Error(message);
-//         }
-
-//         return await response.json();
-//     } catch (error) {
-//         alert((error as Error).message);
-//     }
-// };
-
-const checkMateCheck = (chess: Chess, roomId: number) => {
-    if (!chess.isGameOver()) return;
-
-    // if (chess.isCheckmate()) {
-    //     setTimeout(async () => {
-    //         const loser = chess.turn();
-
-    //         await sendWinner({ roomId, color: loser });
-
-    //         if (loser === "b") {
-    //             alert("white win");
-    //         } else {
-    //             alert("Black win");
-    //         }
-    //     }, 2000);
-    // }
-};
-
 type Move =
     | string
     | {
@@ -75,26 +19,44 @@ type Move =
 
 export const GamePage = () => {
     const [chess, setChess] = useState(new Chess());
+    // const [chess, setChess] = useState(
+    //     new Chess("7k/6Q1/6K1/8/8/8/8/8 b - - 0")
+    // ); //checkmate
+    // const [chess, setChess] = useState(
+    //     new Chess("7k/5Q2/7K/8/8/8/8/8 b - - 0 1")
+    // ); //stalemate
+    // const [chess, setChess] = useState(
+    //     new Chess("8/8/8/8/8/8/2k5/K7 w - - 100 200")
+    // ); //draw
 
     const params = useParams();
     const { socket, connect, disconnect } = useWebSocketContext();
 
-    // const socket = useMemo(() => {
-    //     if (!("roomId" in params)) return null;
+    useEffect(() => {
+        if (
+            chess.moves().length === 0 &&
+            !chess.isCheckmate() &&
+            chess.isDraw()
+        ) {
+            console.log("Moves: ");
+            console.log(chess.moves());
 
-    //     return new WebSocket(
-    //         `wss://www.chesswebapp.xyz/api/v1/room/play?room_id=${params.roomId}&user_id=${JSON.parse(localStorage.getItem("user") || "{}")?.user_id}`
-    //     );
-    // }, [params]);
+            console.log("Stalemate detected");
+            return;
+        }
 
-    // const tg = (
-    //     window as Window & typeof globalThis & { Telegram: TelegramClient }
-    // ).Telegram.WebApp;
+        if (chess.isCheckmate()) {
+            console.log("Checkmate detected");
+            return;
+        }
+
+        if (chess.isDraw()) {
+            console.log("Draw detected");
+            return;
+        }
+    }, [chess]);
 
     useEffect(() => {
-        console.log("Params: ");
-        console.log(params);
-
         if (!("roomId" in params) || !params?.roomId) return;
 
         const stored = localStorage.getItem("user");
@@ -102,9 +64,6 @@ export const GamePage = () => {
         if (!stored) return;
 
         const user = JSON.parse(stored);
-
-        console.log("User");
-        console.log(user);
 
         if (!("user_id" in user) || !user.user_id) return;
 
@@ -141,10 +100,6 @@ export const GamePage = () => {
 
                     setChess(newChess);
 
-                    if (!("roomId" in params) || !params.roomId) return;
-
-                    checkMateCheck(newChess, parseInt(params.roomId));
-
                     break;
                 }
 
@@ -171,11 +126,18 @@ export const GamePage = () => {
 
         setChess(newChess);
 
-        checkMateCheck(newChess, parseInt(params?.roomId || "0"));
-
         socket?.send(JSON.stringify({ type: "move", data: chess.fen() }));
 
-        if (chess.isGameOver()) {
+        if (
+            chess.moves().length === 0 &&
+            !chess.isCheckmate() &&
+            chess.isDraw()
+        ) {
+            socket?.send(JSON.stringify({ type: "draw", detail: "stalemate" }));
+            return;
+        }
+
+        if (chess.isCheckmate()) {
             const color = sessionStorage.getItem("color");
 
             if (!color)
@@ -184,14 +146,12 @@ export const GamePage = () => {
                 );
 
             socket?.send(JSON.stringify({ type: "checkmate", winner: color }));
+            return;
         }
 
         if (chess.isDraw()) {
             socket?.send(JSON.stringify({ type: "draw", detail: "draw" }));
-        }
-
-        if (chess.moves().length === 0) {
-            socket?.send(JSON.stringify({ type: "draw", detail: "stalemate" }));
+            return;
         }
     }
 
