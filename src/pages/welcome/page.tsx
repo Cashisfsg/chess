@@ -11,7 +11,7 @@ export const WelcomePage = () => {
 
     useEffect(() => {
         (async () => {
-            if (tg?.initDataUnsafe?.user?.id) return;
+            if (!tg?.initDataUnsafe?.user?.id) return;
 
             await createNewUser({
                 user_id: String(tg?.initDataUnsafe?.user?.id),
