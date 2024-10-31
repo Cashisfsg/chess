@@ -1,15 +1,15 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useSWR from "swr";
 
 import { baseQuery } from "@/shared/api/config";
 import { buildQueryString } from "@/shared/lib/utils/build-query-string";
 import { composeEventHandlers } from "@/shared/lib/utils/compose-event-handlers";
+import { TelegramClient } from "@/shared/api/telegram/types";
 
-interface User {
-    user_id: string;
-    fullname: string;
-    username: string;
+interface SearchRoomResponse {
+    room_id: number;
+    color: "black" | "white";
 }
 
 interface SearchGameButtonProps
@@ -19,28 +19,17 @@ export const SearchGameButton: React.FC<SearchGameButtonProps> = ({
     onClick,
     ...props
 }) => {
+    const tg = (
+        window as Window & typeof globalThis & { Telegram: TelegramClient }
+    ).Telegram.WebApp;
+
     const [skipRequest, setSkipRequest] = useState(true);
     const navigate = useNavigate();
 
-    const user = useMemo(() => {
-        const data = localStorage.getItem("user");
-
-        if (!data) return null;
-
-        const user: User = JSON.parse(data);
-
-        if (!("user_id" in user)) return null;
-
-        return user;
-    }, []);
-
-    const { isLoading, mutate } = useSWR<{
-        room_id: number;
-        color: "black" | "white";
-    }>(
-        !skipRequest && user?.user_id
+    const { isLoading, mutate } = useSWR<SearchRoomResponse>(
+        !skipRequest && tg?.initDataUnsafe?.user?.id
             ? buildQueryString("/search", {
-                  user_id: user.user_id
+                  user_id: tg?.initDataUnsafe?.user?.id
               })
             : null,
         baseQuery,
@@ -59,13 +48,6 @@ export const SearchGameButton: React.FC<SearchGameButtonProps> = ({
     const onClickHandler: React.MouseEventHandler<
         HTMLButtonElement
     > = async () => {
-        if (!user) {
-            alert(
-                "Чтобы приступитьк поиску необходимо сначала создать пользователя"
-            );
-            return;
-        }
-
         if (skipRequest) {
             setSkipRequest(false);
             return;

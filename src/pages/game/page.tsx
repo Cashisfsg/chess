@@ -5,9 +5,10 @@ import { Chess, Square, validateFen } from "chess.js";
 import { Chessboard } from "react-chessboard";
 
 import { useWebSocketContext } from "@/app/providers/web-socket/use-web-socket-context";
-import { UserCard } from "@/entities/user";
 
 import { GameOverDialog } from "@/widgets/game-over-dialog";
+import { UserCard } from "@/entities/user";
+import { TelegramClient } from "@/shared/api/telegram/types";
 
 type Move =
     | string
@@ -19,6 +20,10 @@ type Move =
 
 export const GamePage = () => {
     const [chess, setChess] = useState(new Chess());
+
+    const tg = (
+        window as Window & typeof globalThis & { Telegram: TelegramClient }
+    ).Telegram.WebApp;
     // const [chess, setChess] = useState(
     //     new Chess("7k/6Q1/6K1/8/8/8/8/8 b - - 0")
     // ); //checkmate
@@ -33,49 +38,20 @@ export const GamePage = () => {
     const { socket, connect, disconnect } = useWebSocketContext();
 
     useEffect(() => {
-        if (
-            chess.moves().length === 0 &&
-            !chess.isCheckmate() &&
-            chess.isDraw()
-        ) {
-            console.log("Moves: ");
-            console.log(chess.moves());
-
-            console.log("Stalemate detected");
-            return;
-        }
-
-        if (chess.isCheckmate()) {
-            console.log("Checkmate detected");
-            return;
-        }
-
-        if (chess.isDraw()) {
-            console.log("Draw detected");
-            return;
-        }
-    }, [chess]);
-
-    useEffect(() => {
         if (!("roomId" in params) || !params?.roomId) return;
 
-        const stored = localStorage.getItem("user");
+        const user = tg?.initDataUnsafe?.user;
 
-        if (!stored) return;
-
-        const user = JSON.parse(stored);
-
-        if (!("user_id" in user) || !user.user_id) return;
+        if (!user.id) return;
 
         const { roomId } = params;
-        const { user_id: userId } = user;
 
-        connect({ roomId, userId });
+        connect({ roomId, userId: String(user.id) });
 
         return () => {
             disconnect();
         };
-    }, [params]);
+    }, [params, tg?.initDataUnsafe?.user]);
 
     useEffect(() => {
         if (!socket) return;

@@ -1,10 +1,25 @@
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { TelegramClient } from "../../shared/api/telegram/types";
+
+import { TelegramClient } from "@/shared/api/telegram/types";
+import { createNewUser } from "@/entities/user/api/create-user";
 
 export const WelcomePage = () => {
     const tg = (
         window as Window & typeof globalThis & { Telegram: TelegramClient }
     ).Telegram.WebApp;
+
+    useEffect(() => {
+        (async () => {
+            if (tg?.initDataUnsafe?.user?.id) return;
+
+            await createNewUser({
+                user_id: String(tg?.initDataUnsafe?.user?.id),
+                fullname: tg?.initDataUnsafe?.user?.first_name,
+                username: tg?.initDataUnsafe?.user?.username
+            });
+        })();
+    }, [tg?.initDataUnsafe?.user]);
 
     return (
         <main className="grid flex-auto place-content-center gap-y-8">

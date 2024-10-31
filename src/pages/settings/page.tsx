@@ -1,60 +1,59 @@
-import { useState, useEffect } from "react";
+// import { useState, useEffect } from "react";
 
 import { SearchGameButton } from "@/features/game/search";
-import { createNewUser } from "@/entities/user/api/create-user";
+// import { createNewUser } from "@/entities/user/api/create-user";
 
-interface FormFields {
-    userId: HTMLInputElement;
-    fullName: HTMLInputElement;
-    userName: HTMLInputElement;
-}
+// interface FormFields {
+//     userId: HTMLInputElement;
+//     fullName: HTMLInputElement;
+//     userName: HTMLInputElement;
+// }
 
-interface User {
-    user_id: string;
-    fullname: string;
-    username: string;
-}
+// interface User {
+//     user_id: string;
+//     fullname: string;
+//     username: string;
+// }
 
 export const SettingsPage = () => {
-    const [user, setUser] = useState<User | null>(null);
+    // const [user, setUser] = useState<User | null>(null);
 
-    useEffect(() => {
-        const storedUser = localStorage.getItem("user");
+    // useEffect(() => {
+    //     const storedUser = localStorage.getItem("user");
 
-        if (!storedUser) return;
+    //     if (!storedUser) return;
 
-        setUser(JSON.parse(storedUser));
-    }, []);
+    //     setUser(JSON.parse(storedUser));
+    // }, []);
 
-    const onSubmitHandler: React.FormEventHandler<
-        HTMLFormElement & FormFields
-    > = async event => {
-        event.preventDefault();
+    // const onSubmitHandler: React.FormEventHandler<
+    //     HTMLFormElement
+    // > = async event => {
+    //     event.preventDefault();
 
-        const { userId, fullName, userName } = event.currentTarget;
+    //     const { userId, fullName, userName } = event.currentTarget;
 
-        try {
-            const newUser = {
-                user_id: userId.value,
-                fullname: fullName.value,
-                username: userName.value
-            };
+    //     try {
+    //         const newUser = {
+    //             user_id: userId.value,
+    //             fullname: fullName.value,
+    //             username: userName.value
+    //         };
 
-            await createNewUser(newUser);
+    //         await createNewUser(newUser);
 
-            localStorage.setItem("user", JSON.stringify(newUser));
-            setUser(newUser);
-        } catch (error) {
-            console.error(error);
-        }
-    };
+    //         // setUser(newUser);
+    //     } catch (error) {
+    //         console.error(error);
+    //     }
+    // };
 
     return (
         <main className="grid flex-auto grid-rows-[auto_1fr_auto] gap-y-8">
             <h1 className="text-4xl font-bold">Настройки</h1>
 
             <section className="grid place-content-center gap-y-4">
-                {!user ? (
+                {/* {!user ? (
                     <form
                         onSubmit={onSubmitHandler}
                         className="grid gap-y-4"
@@ -98,7 +97,7 @@ export const SettingsPage = () => {
                     >
                         Удалить пользователя
                     </button>
-                )}
+                )} */}
 
                 <SearchGameButton />
 
