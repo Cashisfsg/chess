@@ -5,7 +5,7 @@ interface FormFields {
 }
 
 export const TestPage = () => {
-    const [state, dispatch] = useTelegramCloudStorage<string>();
+    const [state, dispatch] = useTelegramCloudStorage<string>("test_query");
 
     console.log("Telegram cloud storage value: " + state.data);
     console.log(state);
@@ -19,7 +19,7 @@ export const TestPage = () => {
 
         dispatch({
             type: "create",
-            payload: { key: "query", value: query.value }
+            payload: { value: query.value }
         });
     };
 
@@ -37,7 +37,7 @@ export const TestPage = () => {
             <button
                 type="button"
                 onClick={() => {
-                    dispatch({ type: "read", payload: { key: "query" } });
+                    dispatch({ type: "read" });
                 }}
             >
                 Прочитать из хранилища
