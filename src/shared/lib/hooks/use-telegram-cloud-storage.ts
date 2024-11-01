@@ -57,6 +57,9 @@ const reducer = <T>(state: State<T>, action: Action<T>): State<T> => {
                 action.payload.key,
                 JSON.stringify(action.payload.value),
                 (error, success) => {
+                    console.log("Error: " + error);
+                    console.log("Success: " + success);
+
                     if (error === null && success) {
                         initialState = {
                             ...state,
@@ -92,6 +95,9 @@ const reducer = <T>(state: State<T>, action: Action<T>): State<T> => {
             }
 
             cloudStorage.getItem(action.payload.key, (error, value) => {
+                console.log("Error: " + error);
+                console.log("Value: " + value);
+
                 if (error === null && value) {
                     initialState = {
                         ...state,

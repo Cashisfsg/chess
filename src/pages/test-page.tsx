@@ -7,6 +7,9 @@ interface FormFields {
 export const TestPage = () => {
     const [state, dispatch] = useTelegramCloudStorage<string>();
 
+    console.log("Telegram cloud storage value: " + state.data);
+    console.log(state);
+
     const onSubmitHandler: React.FormEventHandler<
         HTMLFormElement & FormFields
     > = event => {
