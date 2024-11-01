@@ -13,11 +13,15 @@ export const WelcomePage = () => {
         (async () => {
             if (!tg?.initDataUnsafe?.user?.id) return;
 
-            await createNewUser({
-                user_id: String(tg?.initDataUnsafe?.user?.id),
-                fullname: tg?.initDataUnsafe?.user?.first_name,
-                username: tg?.initDataUnsafe?.user?.username
-            });
+            try {
+                await createNewUser({
+                    user_id: String(tg?.initDataUnsafe?.user?.id),
+                    fullname: tg?.initDataUnsafe?.user.first_name,
+                    username: tg?.initDataUnsafe?.user?.username
+                });
+            } catch (error) {
+                console.error((error as Error)?.message);
+            }
         })();
     }, [tg?.initDataUnsafe?.user]);
 

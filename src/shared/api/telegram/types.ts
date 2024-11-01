@@ -99,11 +99,13 @@ interface SettingsButton {
     hide: () => void;
 }
 
+type NotificationType = "error" | "success" | "warning";
+
 interface HapticFeedback {
     impactOccurred: (
         style: "light" | "medium" | "heavy" | "rigid" | "soft"
     ) => void;
-    notificationOccurred: (type: "error" | "success" | "warning") => void;
+    notificationOccurred: (type: NotificationType) => void;
     selectionChanged: () => void;
 }
 
@@ -141,6 +143,10 @@ export interface CloudStorage {
 
 type BiometricType = "finger" | "face" | "unknown";
 
+interface BiometricRequestAccessParams {
+    reason?: string;
+}
+
 interface BiometricAuthenticateParams {
     // !The text to be displayed to a user in the popup describing why you are asking them to authenticate and what action you will be taking based on that authentication, 0-128 characters.
     reason?: string;
@@ -156,8 +162,8 @@ interface BiometricManager {
     deviceId: string;
     init: (callback?: () => void) => void;
     requestAccess: (
-        params: BiometricAuthenticateParams,
-        callback?: () => void
+        params: BiometricRequestAccessParams,
+        callback?: (accessGranted: boolean) => void
     ) => void;
     authenticate: (
         params: BiometricAuthenticateParams,
