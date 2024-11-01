@@ -42,6 +42,15 @@ export const TestPage = () => {
             >
                 Прочитать из хранилища
             </button>
+
+            <button
+                type="button"
+                onClick={() => {
+                    dispatch({ type: "delete" });
+                }}
+            >
+                Удалить из хранилища
+            </button>
         </form>
     );
 };

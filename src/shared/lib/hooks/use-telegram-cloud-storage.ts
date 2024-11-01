@@ -22,124 +22,18 @@ interface ErrorState<D> {
 
 type State<D> = InitialState | SuccessState<D> | ErrorState<D>;
 
-type Action<D> = { type: "create"; payload: { value: D } } | { type: "read" };
+type Action<D> =
+    | { type: "create"; payload: { value: D } }
+    | { type: "read" }
+    | { type: "delete" };
 
 type SecondAction<D> =
     | { type: "fulfill"; payload: { value: D } }
-    | { type: "reject"; payload: { error: Error } };
-
-// const getStorageItem = <T>(key: string): Promise<T> => {
-//     return new Promise((resolve, reject) => {
-//         const tg = (
-//             window as Window & typeof globalThis & { Telegram: TelegramClient }
-//         ).Telegram.WebApp;
-
-//         const cloudStorage = tg.CloudStorage;
-
-//         cloudStorage.getItem(key, (error, value) => {
-//             console.log("Error: " + error);
-//             console.log("Value: " + value);
-
-//             if (error === null && value) {
-//                 resolve(JSON.parse(value));
-//             } else if (typeof error === "string" && value === undefined) {
-//                 reject(error);
-//             }
-//         });
-//     });
-// };
+    | { type: "reject"; payload: { error: Error } }
+    | { type: "reset" };
 
 const reducer = <T>(state: State<T>, action: SecondAction<T>): State<T> => {
-    // const tg = (
-    //     window as Window & typeof globalThis & { Telegram: TelegramClient }
-    // ).Telegram.WebApp;
-
-    // const cloudStorage = tg.CloudStorage;
-
     switch (action.type) {
-        // case "create": {
-        //     let initialState = state;
-
-        //     if (!/^[A-Za-z0-9_-]{1,128}$/.test(action.payload.key)) {
-        //         return {
-        //             ...state,
-        //             status: "rejected",
-        //             error: new Error("Invalid key format")
-        //         };
-        //     }
-
-        //     if (JSON.stringify(action.payload.value).length > 4096) {
-        //         return {
-        //             ...state,
-        //             status: "rejected",
-        //             error: new Error("Value exceeds 4096 characters")
-        //         };
-        //     }
-
-        //     cloudStorage.setItem(
-        //         action.payload.key,
-        //         JSON.stringify(action.payload.value),
-        //         (error, success) => {
-        //             console.log("Error: " + error);
-        //             console.log("Success: " + success);
-
-        //             if (error === null && success) {
-        //                 initialState = {
-        //                     ...state,
-        //                     status: "fulfilled",
-        //                     data: action.payload.value,
-        //                     error: null
-        //                 };
-        //             } else if (
-        //                 typeof error === "string" &&
-        //                 success === undefined
-        //             ) {
-        //                 initialState = {
-        //                     ...state,
-        //                     status: "rejected",
-        //                     error: new Error(error)
-        //                 };
-        //             }
-        //         }
-        //     );
-
-        //     return initialState;
-        // }
-
-        // case "read": {
-        //     let initialState = state;
-
-        //     if (!/^[A-Za-z0-9_-]{1,128}$/.test(action.payload.key)) {
-        //         return {
-        //             ...state,
-        //             status: "rejected",
-        //             error: new Error("Invalid key format")
-        //         };
-        //     }
-
-        //     cloudStorage.getItem(action.payload.key, (error, value) => {
-        //         console.log("Error: " + error);
-        //         console.log("Value: " + value);
-
-        //         if (error === null && value) {
-        //             initialState = {
-        //                 ...state,
-        //                 status: "fulfilled",
-        //                 data: JSON.parse(value),
-        //                 error: null
-        //             };
-        //         } else if (typeof error === "string" && value === undefined) {
-        //             initialState = {
-        //                 ...state,
-        //                 status: "rejected",
-        //                 error: new Error(error)
-        //             };
-        //         }
-        //     });
-
-        //     return initialState;
-        // }
-
         case "fulfill":
             return {
                 ...state,
@@ -155,6 +49,14 @@ const reducer = <T>(state: State<T>, action: SecondAction<T>): State<T> => {
                 error: action.payload.error
             };
 
+        case "reset":
+            return {
+                ...state,
+                status: "idle",
+                data: undefined,
+                error: null
+            };
+
         default:
             return state;
     }
@@ -167,16 +69,6 @@ const initialState: InitialState = {
 };
 
 export const useTelegramCloudStorage = <T>(key: string) => {
-    // const [value, setValue] = useState<T | undefined>(undefined);
-
-    // const cloudStorage = useRef(() => {
-    //     const tg = (
-    //         window as Window & typeof globalThis & { Telegram: TelegramClient }
-    //     ).Telegram.WebApp;
-
-    //     return tg.CloudStorage;
-    // });
-
     const tg = (
         window as Window & typeof globalThis & { Telegram: TelegramClient }
     ).Telegram.WebApp;
@@ -192,6 +84,16 @@ export const useTelegramCloudStorage = <T>(key: string) => {
             switch (action.type) {
                 case "create":
                     return new Promise((resolve, reject) => {
+                        if (!/^[A-Za-z0-9_-]{1,128}$/.test(key)) {
+                            reject("Invalid key format");
+                        }
+
+                        if (
+                            JSON.stringify(action.payload.value).length > 4096
+                        ) {
+                            reject("Value exceeds 4096 characters");
+                        }
+
                         cloudStorage.setItem(
                             key,
                             JSON.stringify(action.payload.value),
@@ -202,7 +104,7 @@ export const useTelegramCloudStorage = <T>(key: string) => {
                                     typeof error === "string" &&
                                     success === undefined
                                 ) {
-                                    reject(new Error(error));
+                                    reject(error);
                                 }
                             }
                         );
@@ -216,16 +118,17 @@ export const useTelegramCloudStorage = <T>(key: string) => {
                         .catch(error =>
                             dispatch({
                                 type: "reject",
-                                payload: { error: new Error(error) }
+                                payload: { error: error }
                             })
                         );
 
                 case "read":
                     return new Promise((resolve, reject) => {
-                        cloudStorage.getItem(key, (error, value) => {
-                            console.log("Error: " + error);
-                            console.log("Value: " + value);
+                        if (!/^[A-Za-z0-9_-]{1,128}$/.test(key)) {
+                            reject("Invalid key format");
+                        }
 
+                        cloudStorage.getItem(key, (error, value) => {
                             if (error === null && value) {
                                 resolve(JSON.parse(value));
                             } else if (
@@ -249,8 +152,30 @@ export const useTelegramCloudStorage = <T>(key: string) => {
                             })
                         );
 
-                // case "read":
-                //     break;
+                case "delete":
+                    return new Promise((resolve, reject) => {
+                        cloudStorage.removeItem(key, (error, success) => {
+                            if (error === null && success) {
+                                resolve(success);
+                            } else if (
+                                typeof error === "string" &&
+                                success === undefined
+                            ) {
+                                reject(error);
+                            }
+                        });
+                    })
+                        .then(success => {
+                            if (success) {
+                                dispatch({ type: "reset" });
+                            }
+                        })
+                        .catch(error =>
+                            dispatch({
+                                type: "reject",
+                                payload: { error: error }
+                            })
+                        );
 
                 default:
                     break;
@@ -258,21 +183,6 @@ export const useTelegramCloudStorage = <T>(key: string) => {
         },
         [key]
     );
-
-    // const setItem = (
-    //     value: T,
-    //     callback?: (error: Error | null, success?: boolean) => void
-    // ) => {
-    //     cloudStorage.setItem(key, JSON.stringify(value), callback);
-    // };
-
-    // const getItem = (
-    //     key: string
-    //     // callback?: (error: Error | null, value?: string) => string | void
-    // ) =>
-    //     cloudStorage.getItem(key, (error, storedValue) => {
-    //         return storedValue;
-    //     });
 
     return [value, reduce] as const;
 };
