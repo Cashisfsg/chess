@@ -3,6 +3,7 @@ import { WelcomePage } from "@/pages/welcome";
 import { SettingsPage } from "@/pages/settings/page";
 import { GamePage } from "@/pages/game";
 import { RoomPage } from "@/pages/room/page";
+import { TestPage } from "@/pages/test-page";
 
 const router = createBrowserRouter([
     {
@@ -23,7 +24,7 @@ const router = createBrowserRouter([
     },
     {
         path: "test",
-        element: <></>
+        element: <TestPage />
     }
 ]);
 
