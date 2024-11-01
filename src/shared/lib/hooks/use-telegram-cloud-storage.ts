@@ -190,6 +190,36 @@ export const useTelegramCloudStorage = <T>(key: string) => {
     const reduce = useCallback(
         async (action: Action<T>): Promise<void> => {
             switch (action.type) {
+                case "create":
+                    return new Promise((resolve, reject) => {
+                        cloudStorage.setItem(
+                            key,
+                            JSON.stringify(action.payload.value),
+                            (error, success) => {
+                                if (error === null && success) {
+                                    resolve(action.payload.value);
+                                } else if (
+                                    typeof error === "string" &&
+                                    success === undefined
+                                ) {
+                                    reject(new Error(error));
+                                }
+                            }
+                        );
+                    })
+                        .then(data =>
+                            dispatch({
+                                type: "fulfill",
+                                payload: { value: data as T }
+                            })
+                        )
+                        .catch(error =>
+                            dispatch({
+                                type: "reject",
+                                payload: { error: new Error(error) }
+                            })
+                        );
+
                 case "read":
                     return new Promise((resolve, reject) => {
                         cloudStorage.getItem(key, (error, value) => {
