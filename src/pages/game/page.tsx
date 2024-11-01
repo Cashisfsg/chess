@@ -42,7 +42,7 @@ export const GamePage = () => {
 
         const user = tg?.initDataUnsafe?.user;
 
-        if (!user.id) return;
+        if (!user?.id) return;
 
         const { roomId } = params;
 

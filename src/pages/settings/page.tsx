@@ -1,4 +1,5 @@
 // import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 
 import { SearchGameButton } from "@/features/game/search";
 // import { createNewUser } from "@/entities/user/api/create-user";
@@ -149,7 +150,10 @@ export const SettingsPage = () => {
                     <span className="text-2xl font-bold">Найти соперника</span>
                 </button>
 
-                <button className="flex items-center justify-center gap-x-4 rounded-2xl bg-black/30 px-6 py-4 shadow-lg transition-colors duration-150 active:bg-white/15">
+                <Link
+                    to="/test"
+                    className="flex items-center justify-center gap-x-4 rounded-2xl bg-black/30 px-6 py-4 shadow-lg transition-colors duration-150 active:bg-white/15"
+                >
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="55"
@@ -195,7 +199,7 @@ export const SettingsPage = () => {
                         />
                     </svg>
                     <span className="text-2xl font-bold">Создать лобби</span>
-                </button>
+                </Link>
 
                 {/* <button className="flex items-center justify-center gap-x-4 rounded-2xl bg-black/30 px-6 py-4 shadow-lg transition-colors duration-150 active:bg-white/15">
                     <svg

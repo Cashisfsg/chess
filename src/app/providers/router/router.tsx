@@ -20,6 +20,10 @@ const router = createBrowserRouter([
     {
         path: "room/:roomId",
         element: <RoomPage />
+    },
+    {
+        path: "test",
+        element: <></>
     }
 ]);
 
