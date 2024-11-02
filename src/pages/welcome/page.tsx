@@ -11,11 +11,14 @@ export const WelcomePage = () => {
         window as Window & typeof globalThis & { Telegram: TelegramClient }
     ).Telegram.WebApp;
 
-    const [, dispatch] = useTelegramCloudStorage<{
+    const [state, dispatch] = useTelegramCloudStorage<{
         user_id: string;
         fullname: string;
         username: string | undefined;
     }>("user");
+
+    console.log("State: ");
+    console.log(state);
 
     useEffect(() => {
         (async () => {
@@ -67,6 +70,9 @@ export const WelcomePage = () => {
                     </span>
                 </p>
             </header>
+
+            <span>{state.error?.message}</span>
+            <span>{state.status}</span>
 
             <section className="grid gap-y-8">
                 <Link
