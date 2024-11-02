@@ -92,6 +92,9 @@ export const useTelegramCloudStorage = <T>(key: string) => {
             .Telegram.WebApp.CloudStorage
     );
 
+    console.log("CloudStorage: ");
+    console.log(cloudStorage.current);
+
     const [value, dispatch] = useReducer<
         (state: State<T>, action: SecondAction<T>) => State<T>
     >(reducer, initialState);
@@ -117,6 +120,9 @@ export const useTelegramCloudStorage = <T>(key: string) => {
                             key,
                             value,
                             (error, success) => {
+                                console.log("Error: " + error);
+                                console.log("Success: " + success);
+
                                 if (error === null && success) {
                                     resolve(action.payload);
                                 } else if (

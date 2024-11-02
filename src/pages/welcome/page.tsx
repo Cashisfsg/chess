@@ -24,6 +24,9 @@ export const WelcomePage = () => {
             try {
                 const user = await dispatch({ type: "read" });
 
+                console.log("User");
+                console.log(user);
+
                 if (user) return;
 
                 await createNewUser({
