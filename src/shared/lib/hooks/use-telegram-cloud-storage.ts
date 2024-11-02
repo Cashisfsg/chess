@@ -183,6 +183,9 @@ export const useTelegramCloudStorage = <T>(key: string) => {
                             return data as T;
                         })
                         .catch(error => {
+                            console.log("Catch error: ");
+                            console.log(error?.message);
+
                             dispatch({
                                 type: "rejected",
                                 payload: error

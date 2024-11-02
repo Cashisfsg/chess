@@ -55,7 +55,7 @@ export const WelcomePage = () => {
                 console.error((error as Error)?.message);
             }
         })();
-    }, [tg?.initDataUnsafe?.user?.id]);
+    }, [tg?.initDataUnsafe?.user]);
 
     return (
         <main className="grid flex-auto place-content-center gap-y-8">
