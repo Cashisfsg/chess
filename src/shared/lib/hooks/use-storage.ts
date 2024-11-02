@@ -20,7 +20,12 @@ interface ErrorState {
 
 type State<D> = InitialState | SuccessState<D> | ErrorState;
 
-type Action<D> =
+type ReducerAction<D> =
+    | { type: "reinitialize" }
+    | { type: "fulfill"; payload: D }
+    | { type: "reject"; payload: Error };
+
+type DispatchAction<D> =
     | { type: "set"; payload: D }
     | { type: "get" }
     | { type: "remove" };
@@ -31,79 +36,95 @@ const initialState: InitialState = {
     error: null
 };
 
+const reducer = <T>(state: State<T>, action: ReducerAction<T>): State<T> => {
+    switch (action.type) {
+        case "reinitialize":
+            return { ...state, ...initialState };
+
+        case "fulfill":
+            return {
+                ...state,
+                status: "success",
+                data: action.payload,
+                error: null
+            };
+
+        case "reject":
+            return {
+                ...state,
+                status: "error",
+                data: undefined,
+                error: action.payload
+            };
+
+        default:
+            return state;
+    }
+};
+
 export const useStorage = <T>(
     key: string,
     storage: Storage = localStorage
-): [State<T>, React.Dispatch<Action<T>>] => {
-    const reducer = useCallback(
-        (state: State<T>, action: Action<T>): State<T> => {
+): [State<T>, React.Dispatch<DispatchAction<T>>] => {
+    const [state, dispatch] = useReducer<
+        (state: State<T>, action: ReducerAction<T>) => State<T>
+    >(reducer, initialState);
+
+    const execute = useCallback(
+        (action: DispatchAction<T>): T | undefined => {
             switch (action.type) {
                 case "set":
                     try {
                         storage.setItem(key, JSON.stringify(action.payload));
-                        return {
-                            ...state,
-                            status: "success",
-                            data: action.payload,
-                            error: null
-                        };
+                        dispatch({ type: "fulfill", payload: action.payload });
+                        return action.payload;
                     } catch (error) {
                         console.error((error as Error)?.message);
-                        return {
-                            ...state,
-                            status: "error",
-                            data: undefined,
-                            error: error as Error
-                        };
+                        dispatch({ type: "reject", payload: error as Error });
+                        return undefined;
                     }
 
                 case "get":
                     try {
                         const item = storage.getItem(key);
-                        return item
-                            ? {
-                                  ...state,
-                                  status: "success",
-                                  data: JSON.parse(item),
-                                  error: null
-                              }
-                            : { ...state, ...initialState };
+
+                        if (item) {
+                            const parsedItem = JSON.parse(item);
+                            dispatch({
+                                type: "fulfill",
+                                payload: parsedItem
+                            });
+                            return parsedItem;
+                        }
+
+                        dispatch({ type: "reinitialize" });
+                        return undefined;
                     } catch (error) {
                         console.error((error as Error)?.message);
-                        return {
-                            ...state,
-                            status: "error",
-                            data: undefined,
-                            error: error as Error
-                        };
+                        dispatch({ type: "reject", payload: error as Error });
+                        return undefined;
                     }
 
                 case "remove":
                     try {
                         storage.deleteItem(key);
-                        return { ...state, ...initialState };
+                        dispatch({ type: "reinitialize" });
                     } catch (error) {
                         console.error((error as Error)?.message);
-                        return {
-                            ...state,
-                            status: "error",
-                            data: undefined,
-                            error: error as Error
-                        };
+                        dispatch({ type: "reject", payload: error as Error });
                     }
+                    break;
 
                 default:
-                    return state;
+                    return undefined;
             }
         },
         [key, storage]
     );
 
-    const [state, dispatch] = useReducer(reducer, initialState);
-
     useEffect(() => {
-        dispatch({ type: "get" });
-    }, []);
+        execute({ type: "get" });
+    }, [execute]);
 
-    return [state, dispatch];
+    return [state, execute];
 };
