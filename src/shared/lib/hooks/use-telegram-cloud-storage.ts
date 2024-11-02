@@ -161,6 +161,10 @@ export const useTelegramCloudStorage = <T>(key: string) => {
                             console.log("Error: " + error);
                             console.log("Value: " + value);
 
+                            if (value === "") {
+                                resolve(undefined);
+                            }
+
                             if (error === null && value) {
                                 resolve(JSON.parse(value));
                             } else if (
@@ -172,6 +176,12 @@ export const useTelegramCloudStorage = <T>(key: string) => {
                         });
                     })
                         .then(data => {
+                            if (data === undefined) {
+                                dispatch({ type: "reset" });
+
+                                return undefined;
+                            }
+
                             dispatch({
                                 type: "fulfilled",
                                 payload: data as T
