@@ -4,20 +4,41 @@ import { Link } from "react-router-dom";
 import { TelegramClient } from "@/shared/api/telegram/types";
 import { createNewUser } from "@/entities/user/api/create-user";
 
+import { useTelegramCloudStorage } from "@/shared/lib/hooks/use-telegram-cloud-storage";
+
 export const WelcomePage = () => {
     const tg = (
         window as Window & typeof globalThis & { Telegram: TelegramClient }
     ).Telegram.WebApp;
+
+    const [, dispatch] = useTelegramCloudStorage<{
+        user_id: string;
+        fullname: string;
+        username: string | undefined;
+    }>("user");
 
     useEffect(() => {
         (async () => {
             if (!tg?.initDataUnsafe?.user?.id) return;
 
             try {
+                const user = await dispatch({ type: "read" });
+
+                if (user) return;
+
                 await createNewUser({
                     user_id: String(tg?.initDataUnsafe?.user?.id),
                     fullname: tg?.initDataUnsafe?.user.first_name,
                     username: tg?.initDataUnsafe?.user?.username
+                });
+
+                await dispatch({
+                    type: "create",
+                    payload: {
+                        user_id: String(tg?.initDataUnsafe?.user?.id),
+                        fullname: tg?.initDataUnsafe?.user.first_name,
+                        username: tg?.initDataUnsafe?.user?.username
+                    }
                 });
             } catch (error) {
                 console.error((error as Error)?.message);

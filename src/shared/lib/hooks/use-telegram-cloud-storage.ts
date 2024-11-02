@@ -1,4 +1,4 @@
-import { useReducer, useCallback } from "react";
+import { useReducer, useCallback, useRef } from "react";
 
 import { TelegramClient } from "@/shared/api/telegram/types";
 
@@ -33,14 +33,14 @@ type State<D> =
     | ErrorState<D>;
 
 type Action<D> =
-    | { type: "create"; payload: { value: D } }
+    | { type: "create"; payload: D }
     | { type: "read" }
     | { type: "delete" };
 
 type SecondAction<D> =
     | { type: "pending" }
-    | { type: "fulfilled"; payload: { value: D } }
-    | { type: "rejected"; payload: { error: Error } }
+    | { type: "fulfilled"; payload: D }
+    | { type: "rejected"; payload: Error }
     | { type: "reset" };
 
 const initialState: InitialState = {
@@ -58,7 +58,7 @@ const reducer = <T>(state: State<T>, action: SecondAction<T>): State<T> => {
             return {
                 ...state,
                 status: "fulfilled",
-                data: action.payload.value,
+                data: action.payload,
                 error: null
             };
 
@@ -66,7 +66,7 @@ const reducer = <T>(state: State<T>, action: SecondAction<T>): State<T> => {
             return {
                 ...state,
                 status: "rejected",
-                error: action.payload.error
+                error: action.payload
             };
 
         case "reset":
@@ -81,18 +81,23 @@ const reducer = <T>(state: State<T>, action: SecondAction<T>): State<T> => {
 };
 
 export const useTelegramCloudStorage = <T>(key: string) => {
-    const tg = (
-        window as Window & typeof globalThis & { Telegram: TelegramClient }
-    ).Telegram.WebApp;
+    // const tg = (
+    //     window as Window & typeof globalThis & { Telegram: TelegramClient }
+    // ).Telegram.WebApp;
 
-    const cloudStorage = tg.CloudStorage;
+    // const cloudStorage = tg.CloudStorage;
+
+    const cloudStorage = useRef(
+        (window as Window & typeof globalThis & { Telegram: TelegramClient })
+            .Telegram.WebApp.CloudStorage
+    );
 
     const [value, dispatch] = useReducer<
         (state: State<T>, action: SecondAction<T>) => State<T>
     >(reducer, initialState);
 
     const reduce = useCallback(
-        async (action: Action<T>): Promise<void> => {
+        async (action: Action<T>) => {
             dispatch({ type: "pending" });
 
             switch (action.type) {
@@ -102,35 +107,43 @@ export const useTelegramCloudStorage = <T>(key: string) => {
                             reject("Invalid key format");
                         }
 
-                        const value = JSON.stringify(action.payload.value);
+                        const value = JSON.stringify(action.payload);
 
                         if (value.length > 4096) {
                             reject("Value exceeds 4096 characters");
                         }
 
-                        cloudStorage.setItem(key, value, (error, success) => {
-                            if (error === null && success) {
-                                resolve(action.payload.value);
-                            } else if (
-                                typeof error === "string" &&
-                                success === undefined
-                            ) {
-                                reject(error);
+                        cloudStorage.current.setItem(
+                            key,
+                            value,
+                            (error, success) => {
+                                if (error === null && success) {
+                                    resolve(action.payload);
+                                } else if (
+                                    typeof error === "string" &&
+                                    success === undefined
+                                ) {
+                                    reject(error);
+                                }
                             }
-                        });
+                        );
                     })
-                        .then(data =>
+                        .then(data => {
                             dispatch({
                                 type: "fulfilled",
-                                payload: { value: data as T }
-                            })
-                        )
-                        .catch(error =>
+                                payload: data as T
+                            });
+
+                            return data as T;
+                        })
+                        .catch(error => {
                             dispatch({
                                 type: "rejected",
-                                payload: { error: error }
-                            })
-                        );
+                                payload: error
+                            });
+
+                            return undefined;
+                        });
 
                 case "read":
                     return new Promise((resolve, reject) => {
@@ -138,7 +151,7 @@ export const useTelegramCloudStorage = <T>(key: string) => {
                             reject("Invalid key format");
                         }
 
-                        cloudStorage.getItem(key, (error, value) => {
+                        cloudStorage.current.getItem(key, (error, value) => {
                             if (error === null && value) {
                                 resolve(JSON.parse(value));
                             } else if (
@@ -149,18 +162,22 @@ export const useTelegramCloudStorage = <T>(key: string) => {
                             }
                         });
                     })
-                        .then(data =>
+                        .then(data => {
                             dispatch({
                                 type: "fulfilled",
-                                payload: { value: data as T }
-                            })
-                        )
-                        .catch(error =>
+                                payload: data as T
+                            });
+
+                            return data as T;
+                        })
+                        .catch(error => {
                             dispatch({
                                 type: "rejected",
-                                payload: { error: error }
-                            })
-                        );
+                                payload: error
+                            });
+
+                            return undefined;
+                        });
 
                 case "delete":
                     return new Promise((resolve, reject) => {
@@ -168,16 +185,19 @@ export const useTelegramCloudStorage = <T>(key: string) => {
                             reject("Invalid key format");
                         }
 
-                        cloudStorage.removeItem(key, (error, success) => {
-                            if (error === null && success) {
-                                resolve(success);
-                            } else if (
-                                typeof error === "string" &&
-                                success === undefined
-                            ) {
-                                reject(error);
+                        cloudStorage.current.removeItem(
+                            key,
+                            (error, success) => {
+                                if (error === null && success) {
+                                    resolve(success);
+                                } else if (
+                                    typeof error === "string" &&
+                                    success === undefined
+                                ) {
+                                    reject(error);
+                                }
                             }
-                        });
+                        );
                     })
                         .then(success => {
                             if (success) {
@@ -187,7 +207,7 @@ export const useTelegramCloudStorage = <T>(key: string) => {
                         .catch(error =>
                             dispatch({
                                 type: "rejected",
-                                payload: { error: error }
+                                payload: error
                             })
                         );
 
