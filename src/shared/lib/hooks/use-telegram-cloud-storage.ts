@@ -158,6 +158,9 @@ export const useTelegramCloudStorage = <T>(key: string) => {
                         }
 
                         cloudStorage.current.getItem(key, (error, value) => {
+                            console.log("Error: " + error);
+                            console.log("Value: " + value);
+
                             if (error === null && value) {
                                 resolve(JSON.parse(value));
                             } else if (
