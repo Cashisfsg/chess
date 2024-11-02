@@ -28,9 +28,10 @@ export const GamePage = () => {
 
     const params = useParams();
     const { socket, connect, disconnect } = useWebSocketContext();
-    const [{ data: boardOrientation }, dispatch] = useStorage<
-        "black" | "white"
-    >("color", sessionStorage);
+    const [{ data: boardOrientation }] = useStorage<"black" | "white">(
+        "color",
+        sessionStorage
+    );
 
     useEffect(() => {
         if (!("roomId" in params) || !params?.roomId) return;
@@ -109,8 +110,6 @@ export const GamePage = () => {
         }
 
         if (chess.isCheckmate()) {
-            dispatch({ type: "get" });
-
             if (!boardOrientation)
                 throw Error(
                     "Board orientation does not exist in session storage"

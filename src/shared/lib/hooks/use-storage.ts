@@ -1,4 +1,4 @@
-import { useReducer, useCallback } from "react";
+import { useReducer, useEffect, useCallback } from "react";
 
 interface InitialState {
     status: "initial";
@@ -100,6 +100,10 @@ export const useStorage = <T>(
     );
 
     const [state, dispatch] = useReducer(reducer, initialState);
+
+    useEffect(() => {
+        dispatch({ type: "get" });
+    }, []);
 
     return [state, dispatch];
 };

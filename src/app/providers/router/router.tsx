@@ -1,4 +1,8 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import {
+    createBrowserRouter,
+    RouterProvider,
+    Navigate
+} from "react-router-dom";
 import { WelcomePage } from "@/pages/welcome";
 import { SettingsPage } from "@/pages/settings/page";
 import { GamePage } from "@/pages/game";
@@ -25,6 +29,10 @@ const router = createBrowserRouter([
     {
         path: "test",
         element: <TestPage />
+    },
+    {
+        path: "*",
+        element: <Navigate to="/" />
     }
 ]);
 
