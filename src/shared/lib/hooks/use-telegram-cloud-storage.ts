@@ -174,6 +174,9 @@ export const useTelegramCloudStorage = <T>(key: string) => {
                                 payload: data as T
                             });
 
+                            console.log("Data");
+                            console.log(data);
+
                             return data as T;
                         })
                         .catch(error => {

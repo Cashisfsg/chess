@@ -19,7 +19,12 @@ export const WelcomePage = () => {
 
     useEffect(() => {
         (async () => {
+            console.log("Effect running");
+
             if (!tg?.initDataUnsafe?.user?.id) return;
+
+            console.log("User id");
+            console.log(tg?.initDataUnsafe?.user?.id);
 
             try {
                 const user = await dispatch({ type: "read" });
@@ -47,7 +52,7 @@ export const WelcomePage = () => {
                 console.error((error as Error)?.message);
             }
         })();
-    }, [tg?.initDataUnsafe?.user]);
+    }, [tg?.initDataUnsafe?.user?.id]);
 
     return (
         <main className="grid flex-auto place-content-center gap-y-8">
