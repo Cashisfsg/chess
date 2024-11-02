@@ -81,19 +81,10 @@ const reducer = <T>(state: State<T>, action: SecondAction<T>): State<T> => {
 };
 
 export const useTelegramCloudStorage = <T>(key: string) => {
-    // const tg = (
-    //     window as Window & typeof globalThis & { Telegram: TelegramClient }
-    // ).Telegram.WebApp;
-
-    // const cloudStorage = tg.CloudStorage;
-
     const cloudStorage = useRef(
         (window as Window & typeof globalThis & { Telegram: TelegramClient })
             .Telegram.WebApp.CloudStorage
     );
-
-    console.log("CloudStorage: ");
-    console.log(cloudStorage.current);
 
     const [value, dispatch] = useReducer<
         (state: State<T>, action: SecondAction<T>) => State<T>
@@ -120,9 +111,6 @@ export const useTelegramCloudStorage = <T>(key: string) => {
                             key,
                             value,
                             (error, success) => {
-                                console.log("Error: " + error);
-                                console.log("Success: " + success);
-
                                 if (error === null && success) {
                                     resolve(action.payload);
                                 } else if (
@@ -158,9 +146,6 @@ export const useTelegramCloudStorage = <T>(key: string) => {
                         }
 
                         cloudStorage.current.getItem(key, (error, value) => {
-                            console.log("Error: " + error);
-                            console.log("Value: " + value);
-
                             if (value === "") {
                                 resolve(undefined);
                             }
@@ -187,15 +172,9 @@ export const useTelegramCloudStorage = <T>(key: string) => {
                                 payload: data as T
                             });
 
-                            console.log("Data");
-                            console.log(data);
-
                             return data as T;
                         })
                         .catch(error => {
-                            console.log("Catch error: ");
-                            console.log(error?.message);
-
                             dispatch({
                                 type: "rejected",
                                 payload: error

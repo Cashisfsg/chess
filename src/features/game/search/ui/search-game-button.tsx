@@ -6,6 +6,7 @@ import { baseQuery } from "@/shared/api/config";
 import { buildQueryString } from "@/shared/lib/utils/build-query-string";
 import { composeEventHandlers } from "@/shared/lib/utils/compose-event-handlers";
 import { TelegramClient } from "@/shared/api/telegram/types";
+import { useStorage } from "@/shared/lib/hooks/use-storage";
 
 interface SearchRoomResponse {
     room_id: number;
@@ -25,6 +26,7 @@ export const SearchGameButton: React.FC<SearchGameButtonProps> = ({
 
     const [skipRequest, setSkipRequest] = useState(true);
     const navigate = useNavigate();
+    const [, dispatch] = useStorage("color", sessionStorage);
 
     const { isLoading, mutate } = useSWR<SearchRoomResponse>(
         !skipRequest && tg?.initDataUnsafe?.user?.id
@@ -38,7 +40,7 @@ export const SearchGameButton: React.FC<SearchGameButtonProps> = ({
             revalidateOnFocus: false,
             refreshInterval: 0,
             onSuccess: ({ room_id, color }) => {
-                sessionStorage.setItem("color", color);
+                dispatch({ type: "set", payload: color });
                 navigate(`/game/${room_id}`);
             },
             onError: error => console.error(error)

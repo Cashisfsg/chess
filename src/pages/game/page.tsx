@@ -9,6 +9,7 @@ import { useWebSocketContext } from "@/app/providers/web-socket/use-web-socket-c
 import { GameOverDialog } from "@/widgets/game-over-dialog";
 import { UserCard } from "@/entities/user";
 import { TelegramClient } from "@/shared/api/telegram/types";
+import { useStorage } from "@/shared/lib/hooks/use-storage";
 
 type Move =
     | string
@@ -24,18 +25,12 @@ export const GamePage = () => {
     const tg = (
         window as Window & typeof globalThis & { Telegram: TelegramClient }
     ).Telegram.WebApp;
-    // const [chess, setChess] = useState(
-    //     new Chess("7k/6Q1/6K1/8/8/8/8/8 b - - 0")
-    // ); //checkmate
-    // const [chess, setChess] = useState(
-    //     new Chess("7k/5Q2/7K/8/8/8/8/8 b - - 0 1")
-    // ); //stalemate
-    // const [chess, setChess] = useState(
-    //     new Chess("8/8/8/8/8/8/2k5/K7 w - - 100 200")
-    // ); //draw
 
     const params = useParams();
     const { socket, connect, disconnect } = useWebSocketContext();
+    const [{ data: boardOrientation }, dispatch] = useStorage<
+        "black" | "white"
+    >("color", sessionStorage);
 
     useEffect(() => {
         if (!("roomId" in params) || !params?.roomId) return;
@@ -114,14 +109,16 @@ export const GamePage = () => {
         }
 
         if (chess.isCheckmate()) {
-            const color = sessionStorage.getItem("color");
+            dispatch({ type: "get" });
 
-            if (!color)
+            if (!boardOrientation)
                 throw Error(
                     "Board orientation does not exist in session storage"
                 );
 
-            socket?.send(JSON.stringify({ type: "checkmate", winner: color }));
+            socket?.send(
+                JSON.stringify({ type: "checkmate", winner: boardOrientation })
+            );
             return;
         }
 
@@ -185,24 +182,22 @@ export const GamePage = () => {
     };
 
     return (
-        <main className="flex max-h-full flex-auto basis-full flex-col gap-y-8">
+        <main
+            className={`flex max-h-full flex-auto basis-full gap-y-8 ${boardOrientation === "white" ? "flex-col" : "flex-col-reverse"}`}
+        >
             <UserCard
-                id={"538945734"}
+                fullname={"User"}
                 color="black"
             />
             <div className="flex aspect-square flex-auto items-center">
                 <Chessboard
                     areArrowsAllowed={true}
-                    boardOrientation={
-                        sessionStorage.getItem("color") as "black" | "white"
-                    }
+                    boardOrientation={boardOrientation}
                     position={chess.fen()}
                     isDraggablePiece={({ piece }) => {
-                        const color = sessionStorage.getItem("color");
-
-                        if (color) {
+                        if (boardOrientation) {
                             return (
-                                color.startsWith(chess.turn()) &&
+                                boardOrientation.startsWith(chess.turn()) &&
                                 piece.startsWith(chess.turn())
                             );
                         }
@@ -210,12 +205,8 @@ export const GamePage = () => {
                         return piece.startsWith(chess.turn());
                     }}
                     onPieceClick={(piece, square) => {
-                        const boardOrientation =
-                            sessionStorage.getItem("color");
-
-                        if (!boardOrientation) return;
-
                         if (
+                            !boardOrientation ||
                             !boardOrientation.startsWith(chess.turn()) ||
                             !boardOrientation.startsWith(chess.turn())
                         )
@@ -280,7 +271,7 @@ export const GamePage = () => {
                 />
             </div>
             <UserCard
-                id={"sdf4234"}
+                fullname={tg?.initDataUnsafe?.user?.first_name}
                 color="white"
             />
             <GameOverDialog />

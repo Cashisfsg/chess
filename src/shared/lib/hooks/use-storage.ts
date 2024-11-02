@@ -21,9 +21,9 @@ interface ErrorState {
 type State<D> = InitialState | SuccessState<D> | ErrorState;
 
 type Action<D> =
-    | { type: "create"; payload: { value: D } }
-    | { type: "read" }
-    | { type: "delete" };
+    | { type: "set"; payload: D }
+    | { type: "get" }
+    | { type: "remove" };
 
 const initialState: InitialState = {
     status: "initial",
@@ -31,22 +31,20 @@ const initialState: InitialState = {
     error: null
 };
 
-export const useLocalStorage = <T>(
-    key: string
+export const useStorage = <T>(
+    key: string,
+    storage: Storage = localStorage
 ): [State<T>, React.Dispatch<Action<T>>] => {
     const reducer = useCallback(
         (state: State<T>, action: Action<T>): State<T> => {
             switch (action.type) {
-                case "create":
+                case "set":
                     try {
-                        localStorage.setItem(
-                            key,
-                            JSON.stringify(action.payload.value)
-                        );
+                        storage.setItem(key, JSON.stringify(action.payload));
                         return {
                             ...state,
                             status: "success",
-                            data: action.payload.value,
+                            data: action.payload,
                             error: null
                         };
                     } catch (error) {
@@ -59,9 +57,9 @@ export const useLocalStorage = <T>(
                         };
                     }
 
-                case "read":
+                case "get":
                     try {
-                        const item = localStorage.getItem(key);
+                        const item = storage.getItem(key);
                         return item
                             ? {
                                   ...state,
@@ -80,9 +78,9 @@ export const useLocalStorage = <T>(
                         };
                     }
 
-                case "delete":
+                case "remove":
                     try {
-                        localStorage.deleteItem(key);
+                        storage.deleteItem(key);
                         return { ...state, ...initialState };
                     } catch (error) {
                         console.error((error as Error)?.message);
@@ -98,7 +96,7 @@ export const useLocalStorage = <T>(
                     return state;
             }
         },
-        [key]
+        [key, storage]
     );
 
     const [state, dispatch] = useReducer(reducer, initialState);

@@ -2,104 +2,13 @@
 import { Link } from "react-router-dom";
 
 import { SearchGameButton } from "@/features/game/search";
-// import { createNewUser } from "@/entities/user/api/create-user";
-
-// interface FormFields {
-//     userId: HTMLInputElement;
-//     fullName: HTMLInputElement;
-//     userName: HTMLInputElement;
-// }
-
-// interface User {
-//     user_id: string;
-//     fullname: string;
-//     username: string;
-// }
 
 export const SettingsPage = () => {
-    // const [user, setUser] = useState<User | null>(null);
-
-    // useEffect(() => {
-    //     const storedUser = localStorage.getItem("user");
-
-    //     if (!storedUser) return;
-
-    //     setUser(JSON.parse(storedUser));
-    // }, []);
-
-    // const onSubmitHandler: React.FormEventHandler<
-    //     HTMLFormElement
-    // > = async event => {
-    //     event.preventDefault();
-
-    //     const { userId, fullName, userName } = event.currentTarget;
-
-    //     try {
-    //         const newUser = {
-    //             user_id: userId.value,
-    //             fullname: fullName.value,
-    //             username: userName.value
-    //         };
-
-    //         await createNewUser(newUser);
-
-    //         // setUser(newUser);
-    //     } catch (error) {
-    //         console.error(error);
-    //     }
-    // };
-
     return (
         <main className="grid flex-auto grid-rows-[auto_1fr_auto] gap-y-8">
             <h1 className="text-4xl font-bold">Настройки</h1>
 
             <section className="grid place-content-center gap-y-4">
-                {/* {!user ? (
-                    <form
-                        onSubmit={onSubmitHandler}
-                        className="grid gap-y-4"
-                    >
-                        <label>
-                            <span>Введите ID пользователя</span>
-                            <input
-                                required
-                                type="number"
-                                name="userId"
-                                maxLength={12}
-                            />
-                        </label>
-
-                        <label>
-                            <span>Full name</span>
-                            <input
-                                required
-                                name="fullName"
-                                maxLength={12}
-                            />
-                        </label>
-
-                        <label>
-                            <span>User name</span>
-                            <input
-                                required
-                                name="userName"
-                                maxLength={12}
-                            />
-                        </label>
-
-                        <button>Создать пользователя</button>
-                    </form>
-                ) : (
-                    <button
-                        onClick={() => {
-                            localStorage.removeItem("user");
-                            setUser(null);
-                        }}
-                    >
-                        Удалить пользователя
-                    </button>
-                )} */}
-
                 <SearchGameButton />
 
                 <button className="flex items-center justify-center gap-x-4 rounded-2xl bg-black/30 px-6 py-4 shadow-lg transition-colors duration-150 active:bg-white/15">

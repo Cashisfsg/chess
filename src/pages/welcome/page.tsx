@@ -17,23 +17,12 @@ export const WelcomePage = () => {
         username: string | undefined;
     }>("user");
 
-    console.log("State: ");
-    console.log(state);
-
     useEffect(() => {
         (async () => {
-            console.log("Effect running");
-
             if (!tg?.initDataUnsafe?.user?.id) return;
-
-            console.log("User id");
-            console.log(tg?.initDataUnsafe?.user?.id);
 
             try {
                 const user = await dispatch({ type: "read" });
-
-                console.log("User");
-                console.log(user);
 
                 if (user) return;
 
