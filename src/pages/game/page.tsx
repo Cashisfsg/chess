@@ -185,11 +185,7 @@ export const GamePage = () => {
             className={"flex max-h-full flex-auto basis-full flex-col gap-y-8"}
         >
             <UserCard
-                fullname={
-                    boardOrientation === "white"
-                        ? "User"
-                        : tg?.initDataUnsafe?.user?.first_name
-                }
+                fullname={"User"}
                 color={boardOrientation === "white" ? "black" : "white"}
             />
             <div className="flex aspect-square flex-auto items-center">
@@ -274,11 +270,7 @@ export const GamePage = () => {
                 />
             </div>
             <UserCard
-                fullname={
-                    boardOrientation === "white"
-                        ? tg?.initDataUnsafe?.user?.first_name
-                        : "User"
-                }
+                fullname={tg?.initDataUnsafe?.user?.first_name}
                 color={boardOrientation === "white" ? "white" : "black"}
             />
             <GameOverDialog />
