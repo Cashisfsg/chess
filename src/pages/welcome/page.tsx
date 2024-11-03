@@ -11,7 +11,7 @@ export const WelcomePage = () => {
         window as Window & typeof globalThis & { Telegram: TelegramClient }
     ).Telegram.WebApp;
 
-    const [state, dispatch] = useTelegramCloudStorage<{
+    const [, dispatch] = useTelegramCloudStorage<{
         user_id: string;
         fullname: string;
         username: string | undefined;
@@ -59,9 +59,6 @@ export const WelcomePage = () => {
                     </span>
                 </p>
             </header>
-
-            <span>{state.error?.message}</span>
-            <span>{state.status}</span>
 
             <section className="grid gap-y-8">
                 <Link

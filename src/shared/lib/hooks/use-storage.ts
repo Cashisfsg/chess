@@ -77,12 +77,11 @@ export const useStorage = <T>(
                     try {
                         storage.setItem(key, JSON.stringify(action.payload));
                         dispatch({ type: "fulfill", payload: action.payload });
-                        return action.payload;
                     } catch (error) {
                         console.error((error as Error)?.message);
                         dispatch({ type: "reject", payload: error as Error });
-                        return undefined;
                     }
+                    break;
 
                 case "get":
                     try {
