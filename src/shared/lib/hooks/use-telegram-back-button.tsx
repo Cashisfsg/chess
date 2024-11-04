@@ -21,7 +21,7 @@ export const useTelegramBackButton = <T extends unknown[]>({
     useEffect(() => {
         const button = backButton.current;
 
-        if (button.isVisible) return;
+        if (!button.isVisible) return;
 
         button.show();
         button.onClick(callbackRef.current);
