@@ -26,10 +26,6 @@ export const useTelegramBackButton = <T extends unknown[]>(
         button.show();
         button.onClick(callbackRef.current);
 
-        console.log("onClick function called");
-
-        console.log(callbackRef.current);
-
         return () => {
             button.offClick(callbackRef.current);
             button.hide();

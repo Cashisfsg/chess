@@ -59,6 +59,14 @@ export const GameOverDialog = () => {
 
                     break;
 
+                case "user_disconnected":
+                    setDetails({
+                        label: "Игра окончена",
+                        description: "Связь с противником потеряна"
+                    });
+
+                    break;
+
                 default:
                     break;
             }

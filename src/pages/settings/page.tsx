@@ -1,17 +1,8 @@
-// import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
-
-import { useTelegramBackButton } from "@/shared/lib/hooks/use-telegram-back-button";
+import { Link } from "react-router-dom";
 
 import { SearchGameButton } from "@/features/game/search";
 
 export const SettingsPage = () => {
-    const navigate = useNavigate();
-
-    useTelegramBackButton(() => {
-        navigate("/");
-    });
-
     return (
         <main className="grid flex-auto grid-rows-[auto_1fr_auto] gap-y-8">
             <h1 className="text-4xl font-bold">Настройки</h1>
