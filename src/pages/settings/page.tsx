@@ -8,9 +8,9 @@ import { SearchGameButton } from "@/features/game/search";
 export const SettingsPage = () => {
     const navigate = useNavigate();
 
-    useTelegramBackButton(() => {
-        navigate("/");
-    });
+    // useTelegramBackButton(() => {
+    //     navigate("/");
+    // });
 
     return (
         <main className="grid flex-auto grid-rows-[auto_1fr_auto] gap-y-8">
