@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 // import { baseQuery } from "@/shared/api/config";
 // import { buildQueryString } from "@/shared/lib/utils/build-query-string";
 import { composeEventHandlers } from "@/shared/lib/utils/compose-event-handlers";
-// import { TelegramClient } from "@/shared/api/telegram/types";
+import { TelegramClient } from "@/shared/api/telegram/types";
 import { useStorage } from "@/shared/lib/hooks/use-storage";
 
 // interface SearchRoomResponse {
@@ -20,9 +20,9 @@ export const SearchGameButton: React.FC<SearchGameButtonProps> = ({
     onClick,
     ...props
 }) => {
-    // const tg = (
-    //     window as Window & typeof globalThis & { Telegram: TelegramClient }
-    // ).Telegram.WebApp;
+    const tg = (
+        window as Window & typeof globalThis & { Telegram: TelegramClient }
+    ).Telegram.WebApp;
 
     const [isLoading, setIsLoading] = useState(false);
 
@@ -61,7 +61,13 @@ export const SearchGameButton: React.FC<SearchGameButtonProps> = ({
     // };
 
     const onClickHandler: React.MouseEventHandler<HTMLButtonElement> = () => {
-        const socket = new WebSocket("wss://chesswebapp.xyz/api/v1/search");
+        const user_id = tg?.initDataUnsafe?.user?.id;
+
+        if (!user_id) return;
+
+        const socket = new WebSocket(
+            `wss://chesswebapp.xyz/api/v1/search?user_id=${user_id}`
+        );
 
         setIsLoading(true);
 
@@ -69,6 +75,8 @@ export const SearchGameButton: React.FC<SearchGameButtonProps> = ({
             const response = JSON.parse(event.data);
 
             socket.close(1000, "Close connection");
+
+            if (!("room_id" in response) || !("color" in response)) return;
 
             const { room_id, color } = response;
 
