@@ -1,17 +1,17 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import useSWR from "swr";
+// import useSWR from "swr";
 
-import { baseQuery } from "@/shared/api/config";
-import { buildQueryString } from "@/shared/lib/utils/build-query-string";
+// import { baseQuery } from "@/shared/api/config";
+// import { buildQueryString } from "@/shared/lib/utils/build-query-string";
 import { composeEventHandlers } from "@/shared/lib/utils/compose-event-handlers";
-import { TelegramClient } from "@/shared/api/telegram/types";
+// import { TelegramClient } from "@/shared/api/telegram/types";
 import { useStorage } from "@/shared/lib/hooks/use-storage";
 
-interface SearchRoomResponse {
-    room_id: number;
-    color: "black" | "white";
-}
+// interface SearchRoomResponse {
+//     room_id: number;
+//     color: "black" | "white";
+// }
 
 interface SearchGameButtonProps
     extends React.ComponentPropsWithoutRef<"button"> {}
@@ -20,42 +20,61 @@ export const SearchGameButton: React.FC<SearchGameButtonProps> = ({
     onClick,
     ...props
 }) => {
-    const tg = (
-        window as Window & typeof globalThis & { Telegram: TelegramClient }
-    ).Telegram.WebApp;
+    // const tg = (
+    //     window as Window & typeof globalThis & { Telegram: TelegramClient }
+    // ).Telegram.WebApp;
 
-    const [skipRequest, setSkipRequest] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
+
+    // const [skipRequest, setSkipRequest] = useState(true);
     const navigate = useNavigate();
-    const [, dispatch] = useStorage("color", sessionStorage);
+    const [, dispatch] = useStorage<"black" | "white">("color", sessionStorage);
 
-    const { isLoading, mutate } = useSWR<SearchRoomResponse>(
-        !skipRequest && tg?.initDataUnsafe?.user?.id
-            ? buildQueryString("/search", {
-                  user_id: tg?.initDataUnsafe?.user?.id
-              })
-            : null,
-        baseQuery,
-        {
-            errorRetryCount: 0,
-            revalidateOnFocus: false,
-            refreshInterval: 0,
-            onSuccess: ({ room_id, color }) => {
-                dispatch({ type: "set", payload: color });
-                navigate(`/game/${room_id}`);
-            },
-            onError: error => console.error(error)
-        }
-    );
+    // const { isLoading, mutate } = useSWR<SearchRoomResponse>(
+    //     !skipRequest && tg?.initDataUnsafe?.user?.id
+    //         ? buildQueryString("/search", {
+    //               user_id: tg?.initDataUnsafe?.user?.id
+    //           })
+    //         : null,
+    //     baseQuery,
+    //     {
+    //         errorRetryCount: 0,
+    //         revalidateOnFocus: false,
+    //         refreshInterval: 0,
+    //         onSuccess: ({ room_id, color }) => {
+    //             dispatch({ type: "set", payload: color });
+    //             navigate(`/game/${room_id}`);
+    //         },
+    //         onError: error => console.error(error)
+    //     }
+    // );
 
-    const onClickHandler: React.MouseEventHandler<
-        HTMLButtonElement
-    > = async () => {
-        if (skipRequest) {
-            setSkipRequest(false);
-            return;
-        }
+    // const onClickHandler: React.MouseEventHandler<
+    //     HTMLButtonElement
+    // > = async () => {
+    //     if (skipRequest) {
+    //         setSkipRequest(false);
+    //         return;
+    //     }
 
-        mutate(undefined, { revalidate: true });
+    //     mutate(undefined, { revalidate: true });
+    // };
+
+    const onClickHandler: React.MouseEventHandler<HTMLButtonElement> = () => {
+        const socket = new WebSocket("wss://chesswebapp.xyz/api/v1/search");
+
+        setIsLoading(true);
+
+        socket.onmessage = (event: MessageEvent) => {
+            const response = JSON.parse(event.data);
+
+            socket.close(1000, "Close connection");
+
+            const { room_id, color } = response;
+
+            dispatch({ type: "set", payload: color });
+            navigate(`/game/${room_id}`);
+        };
     };
 
     return (
