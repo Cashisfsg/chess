@@ -66,7 +66,7 @@ export const SearchGameButton: React.FC<SearchGameButtonProps> = ({
         if (!user_id) return;
 
         const socket = new WebSocket(
-            `wss://chesswebapp.xyz/api/v1/search?user_id=${user_id}`
+            `wss://www.chesswebapp.xyz/api/v1/search?user_id=${user_id}`
         );
 
         setIsLoading(true);
@@ -82,6 +82,10 @@ export const SearchGameButton: React.FC<SearchGameButtonProps> = ({
 
             dispatch({ type: "set", payload: color });
             navigate(`/game/${room_id}`);
+        };
+
+        socket.onclose = () => {
+            setIsLoading(false);
         };
     };
 
