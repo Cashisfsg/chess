@@ -74,8 +74,6 @@ export const SearchGameButton: React.FC<SearchGameButtonProps> = ({
         socket.onmessage = (event: MessageEvent) => {
             const response = JSON.parse(event.data);
 
-            socket.close(1000, "Close connection");
-
             if (!("room_id" in response) || !("color" in response)) return;
 
             const { room_id, color } = response;
