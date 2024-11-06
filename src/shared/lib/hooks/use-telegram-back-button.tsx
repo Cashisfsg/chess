@@ -1,12 +1,10 @@
 import { TelegramClient } from "@/shared/api/telegram/types";
 import { useEffect, useLayoutEffect, useRef } from "react";
 
-type TelegramBackButtonProps<T extends unknown[] = []> = (
-    ...args: Partial<T>
-) => void;
+type Callback<T extends unknown[] = []> = (...args: Partial<T>) => void;
 
 export const useTelegramBackButton = <T extends unknown[]>(
-    onClick: TelegramBackButtonProps<T>
+    onClick: Callback<T>
 ) => {
     const backButton = useRef(
         (window as Window & typeof globalThis & { Telegram: TelegramClient })
@@ -16,7 +14,7 @@ export const useTelegramBackButton = <T extends unknown[]>(
 
     useLayoutEffect(() => {
         callbackRef.current = onClick;
-    }, [onClick]);
+    });
 
     useEffect(() => {
         const button = backButton.current;

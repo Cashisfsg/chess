@@ -72,6 +72,20 @@ export const GamePage = () => {
 
                     setChess(newChess);
 
+                    if (newChess.isCheck()) {
+                        document
+                            .querySelector(
+                                `[data-piece=${boardOrientation ? boardOrientation[0] + "K" : "wK"}]`
+                            )
+                            ?.classList.add("attacked");
+                    } else {
+                        document
+                            .querySelector(
+                                `[data-piece=${boardOrientation ? boardOrientation[0] + "K" : "wK"}]`
+                            )
+                            ?.classList.remove("attacked");
+                    }
+
                     break;
                 }
 
@@ -79,7 +93,7 @@ export const GamePage = () => {
                     break;
             }
         });
-    }, [socket, params]);
+    }, [socket, params, boardOrientation]);
 
     const [selectedPiece, setSelectedPiece] = useState<{
         square: string;

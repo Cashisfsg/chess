@@ -1,32 +1,45 @@
 import { useState, useEffect } from "react";
 
-const setItem = (key: string, value: unknown) => {
+const setItem = <T,>(key: string, value: T, storage: Storage): void => {
     try {
-        localStorage.setItem(key, JSON.stringify(value));
+        storage.setItem(key, JSON.stringify(value));
     } catch (error) {
-        console.error(error);
+        console.error((error as Error).message);
     }
 };
 
-const getItem = (key: string) => {
+const getItem = <T,>(key: string, storage: Storage): T | undefined => {
     try {
-        const item = localStorage.getItem(key);
+        const item = storage.getItem(key);
         return item ? JSON.parse(item) : undefined;
     } catch (error) {
-        console.error(error);
+        console.error((error as Error).message);
         return undefined;
     }
 };
 
-export const usePersistedState = <T,>(key: string, initialValue: T) => {
+export const usePersistedState = <T,>(
+    key: string,
+    initialValue: T | (() => T),
+    storage: Storage = localStorage
+) => {
     const [value, setValue] = useState<T>(() => {
-        const item = getItem(key);
-        return item || initialValue;
+        const item = getItem<T>(key, storage);
+
+        if (item) {
+            return item;
+        }
+
+        if (typeof initialValue === "function") {
+            return (initialValue as () => T)();
+        }
+
+        return initialValue;
     });
 
     useEffect(() => {
-        setItem(key, value);
-    }, [key, value]);
+        setItem(key, value, storage);
+    }, [key, value, storage]);
 
     return [value, setValue] as const;
 };

@@ -12,28 +12,53 @@ interface SuccessState<D> {
     error: null;
 }
 
-interface ErrorState {
+interface ErrorState<D> {
     status: "error";
-    data: undefined;
+    data: D | undefined;
     error: Error;
 }
 
-type State<D> = InitialState | SuccessState<D> | ErrorState;
+type State<D> = InitialState | SuccessState<D> | ErrorState<D>;
 
 type ReducerAction<D> =
     | { type: "reinitialize" }
     | { type: "fulfill"; payload: D }
     | { type: "reject"; payload: Error };
 
-type DispatchAction<D> =
+type StorageAction<D> =
     | { type: "set"; payload: D }
     | { type: "get" }
     | { type: "remove" };
+
+interface StorageOptions<T> {
+    serializer?: (item: T) => string;
+    deserializer?: (item: string) => T;
+}
 
 const initialState: InitialState = {
     status: "initial",
     data: undefined,
     error: null
+};
+
+const defaultSerializer = <T>(item: T): string => {
+    try {
+        return JSON.stringify(item);
+    } catch (error) {
+        throw new Error(
+            `Error during serializing JSON: ${(error as Error).message}`
+        );
+    }
+};
+
+const defaultDeserializer = <T>(item: string): T => {
+    try {
+        return JSON.parse(item);
+    } catch (error) {
+        throw new Error(
+            `Error during parsing JSON: ${(error as Error).message}`
+        );
+    }
 };
 
 const reducer = <T>(state: State<T>, action: ReducerAction<T>): State<T> => {
@@ -53,7 +78,6 @@ const reducer = <T>(state: State<T>, action: ReducerAction<T>): State<T> => {
             return {
                 ...state,
                 status: "error",
-                data: undefined,
                 error: action.payload
             };
 
@@ -64,21 +88,27 @@ const reducer = <T>(state: State<T>, action: ReducerAction<T>): State<T> => {
 
 export const useStorage = <T>(
     key: string,
-    storage: Storage = localStorage
-): [State<T>, React.Dispatch<DispatchAction<T>>] => {
+    storage: Storage = localStorage,
+    options?: StorageOptions<T>
+): [State<T>, React.Dispatch<StorageAction<T>>] => {
     const [state, dispatch] = useReducer<
         (state: State<T>, action: ReducerAction<T>) => State<T>
     >(reducer, initialState);
 
-    const execute = useCallback(
-        (action: DispatchAction<T>): T | undefined => {
+    const storageReducer = useCallback(
+        (action: StorageAction<T>): T | undefined => {
             switch (action.type) {
                 case "set":
                     try {
-                        storage.setItem(key, JSON.stringify(action.payload));
+                        storage.setItem(
+                            key,
+                            options?.serializer
+                                ? options.serializer(action.payload)
+                                : defaultSerializer(action.payload)
+                        );
                         dispatch({ type: "fulfill", payload: action.payload });
                     } catch (error) {
-                        console.error((error as Error)?.message);
+                        console.error((error as Error).message);
                         dispatch({ type: "reject", payload: error as Error });
                     }
                     break;
@@ -87,19 +117,23 @@ export const useStorage = <T>(
                     try {
                         const item = storage.getItem(key);
 
-                        if (item) {
-                            const parsedItem = JSON.parse(item);
-                            dispatch({
-                                type: "fulfill",
-                                payload: parsedItem
-                            });
-                            return parsedItem;
+                        if (!item) {
+                            dispatch({ type: "reinitialize" });
+                            return undefined;
                         }
 
-                        dispatch({ type: "reinitialize" });
-                        return undefined;
+                        const parsedItem = options?.deserializer
+                            ? options.deserializer(item)
+                            : defaultDeserializer<T>(item);
+
+                        dispatch({
+                            type: "fulfill",
+                            payload: parsedItem
+                        });
+
+                        return parsedItem;
                     } catch (error) {
-                        console.error((error as Error)?.message);
+                        console.error((error as Error).message);
                         dispatch({ type: "reject", payload: error as Error });
                         return undefined;
                     }
@@ -109,21 +143,21 @@ export const useStorage = <T>(
                         storage.deleteItem(key);
                         dispatch({ type: "reinitialize" });
                     } catch (error) {
-                        console.error((error as Error)?.message);
+                        console.error((error as Error).message);
                         dispatch({ type: "reject", payload: error as Error });
                     }
                     break;
 
                 default:
-                    return undefined;
+                    break;
             }
         },
-        [key, storage]
+        [key, storage, options]
     );
 
     useEffect(() => {
-        execute({ type: "get" });
-    }, [execute]);
+        storageReducer({ type: "get" });
+    }, [storageReducer]);
 
-    return [state, execute];
+    return [state, storageReducer];
 };
