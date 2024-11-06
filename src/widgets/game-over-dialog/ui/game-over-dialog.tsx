@@ -16,7 +16,7 @@ export const GameOverDialog = () => {
         description: ""
     });
     const dialogRef = useRef<HTMLDialogElement>(null);
-    const { socket } = useWebSocketContext();
+    const { socket, disconnect } = useWebSocketContext();
 
     useEffect(() => {
         if (!socket) return;
@@ -72,6 +72,7 @@ export const GameOverDialog = () => {
             }
 
             dialogRef.current?.showModal();
+            disconnect();
         });
     }, [socket]);
 
