@@ -99,6 +99,17 @@ export const WelcomePage = () => {
                     </svg>
                     <span className="text-2xl font-bold">Играть онлайн</span>
                 </Link>
+
+                <button
+                    onClick={() => {
+                        tg.CloudStorage.getKeys((_, keys) => {
+                            if (keys === undefined) return;
+                            tg.CloudStorage.removeItems(keys);
+                        });
+                    }}
+                >
+                    Очистить облачное хранилище
+                </button>
                 {/* 
                 <button className="flex items-center justify-center gap-x-4 rounded-2xl bg-black/30 px-6 py-4 shadow-lg transition-colors duration-150 active:bg-white/15">
                     <svg

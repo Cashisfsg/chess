@@ -136,9 +136,7 @@ export interface CloudStorage {
         keys: string[],
         callback?: (error: Error | null, success?: boolean) => void
     ) => void;
-    getKeys: (
-        callback: (error: Error | null, success?: boolean) => void
-    ) => void;
+    getKeys: (callback: (error: Error | null, keys?: string[]) => void) => void;
 }
 
 type BiometricType = "finger" | "face" | "unknown";
