@@ -126,7 +126,7 @@ export const SearchGameButton: React.FC<SearchGameButtonProps> = ({
                     fill="#8D694B"
                 />
             </svg>
-            Играть онлайн
+            <span> Найти соперника</span>
         </button>
     );
 };

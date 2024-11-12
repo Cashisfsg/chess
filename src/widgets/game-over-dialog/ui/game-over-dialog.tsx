@@ -74,7 +74,7 @@ export const GameOverDialog = () => {
             dialogRef.current?.showModal();
             disconnect();
         });
-    }, [socket]);
+    }, [socket, disconnect]);
 
     return (
         <AlertDialog.Root>
@@ -89,7 +89,7 @@ export const GameOverDialog = () => {
                     {details.description}
                 </AlertDialog.Description>
                 <Link
-                    to="/settings"
+                    to="/search"
                     className="flex items-center justify-center gap-x-4 rounded-2xl bg-[#5d9948] px-6 py-4 text-2xl font-bold text-white shadow-lg transition-colors duration-150 active:bg-[#a3d160] disabled:opacity-50"
                 >
                     Новая игра

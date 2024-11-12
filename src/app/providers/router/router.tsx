@@ -4,10 +4,11 @@ import {
     Navigate
 } from "react-router-dom";
 import { WelcomePage } from "@/pages/welcome";
-import { SettingsPage } from "@/pages/settings/page";
+import { SearchPage } from "@/pages/search";
 import { GamePage } from "@/pages/game";
 import { RoomPage } from "@/pages/room/page";
 import { TestPage } from "@/pages/test-page";
+import { CreateLobbyPage } from "@/pages/create-lobby";
 
 const router = createBrowserRouter([
     {
@@ -15,8 +16,8 @@ const router = createBrowserRouter([
         element: <WelcomePage />
     },
     {
-        path: "settings",
-        element: <SettingsPage />
+        path: "search",
+        element: <SearchPage />
     },
     {
         path: "game/:roomId",
@@ -25,6 +26,10 @@ const router = createBrowserRouter([
     {
         path: "room/:roomId",
         element: <RoomPage />
+    },
+    {
+        path: "lobby",
+        element: <CreateLobbyPage />
     },
     {
         path: "test",
