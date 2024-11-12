@@ -2,7 +2,11 @@ import { Link } from "react-router-dom";
 
 import { SearchGameButton } from "@/features/game/search";
 
+import { useTelegramBackButton } from "@/shared/lib/hooks/use-telegram-back-button";
+
 export const SearchPage = () => {
+    useTelegramBackButton();
+
     return (
         <main className="grid flex-auto grid-rows-[auto_1fr_auto] gap-y-8">
             <h1 className="text-4xl font-bold">Поиск игры</h1>

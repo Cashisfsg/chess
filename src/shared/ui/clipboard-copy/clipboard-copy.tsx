@@ -1,3 +1,5 @@
+import { useRef } from "react";
+
 interface ClipboardCopyProps extends React.ComponentPropsWithoutRef<"button"> {
     textToCopy: number | string | undefined;
 }
@@ -6,15 +8,30 @@ export const ClipboardCopy: React.FC<ClipboardCopyProps> = ({
     textToCopy,
     ...props
 }) => {
+    const buttonTextRef = useRef<HTMLSpanElement>(null);
+
     const copyToClipboard: React.MouseEventHandler<
         HTMLButtonElement
     > = async event => {
         event.preventDefault();
 
+        const button = event.currentTarget;
+
         if (textToCopy === undefined) return;
 
         try {
             await navigator.clipboard.writeText(String(textToCopy));
+
+            button.setAttribute("disabled", "");
+            if (!buttonTextRef.current) return;
+
+            buttonTextRef.current.textContent = "Ссылка скопирована";
+
+            setTimeout(() => {
+                button.removeAttribute("disabled");
+                if (!buttonTextRef.current) return;
+                buttonTextRef.current.textContent = "Копировать ссылку";
+            }, 3000);
         } catch (error) {
             console.error(error);
         }
@@ -25,7 +42,7 @@ export const ClipboardCopy: React.FC<ClipboardCopyProps> = ({
             {...props}
             onClick={copyToClipboard}
             title="Скопировать в буфер обмена"
-            className="flex items-center justify-center gap-x-4 rounded-2xl bg-[#5d9948] px-6 py-4 text-xl font-bold text-white shadow-lg transition-colors duration-150 active:bg-[#a3d160] disabled:opacity-50"
+            className="flex items-center justify-center gap-x-4 rounded-2xl bg-[#5d9948] px-6 py-4 text-xl font-bold text-white shadow-lg transition-colors duration-150 active:bg-[#a3d160] disabled:opacity-80"
         >
             <svg
                 width="24"
@@ -50,7 +67,7 @@ export const ClipboardCopy: React.FC<ClipboardCopyProps> = ({
                     </clipPath>
                 </defs>
             </svg>
-            <span>Копировать ссылку</span>
+            <span ref={buttonTextRef}>Копировать ссылку</span>
         </button>
     );
 };
