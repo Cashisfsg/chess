@@ -87,7 +87,7 @@ export const CreateLobbyPage = () => {
                 <ClipboardCopy textToCopy={"dasdasdad"} />
 
                 <TelegramShareButton
-                    url="https://www.google.com"
+                    params={{ url: "https://www.google.com" }}
                     className="flex items-center justify-center gap-x-4 rounded-2xl bg-black/30 px-6 py-4 text-xl font-bold shadow-lg transition-colors duration-150 active:bg-white/15"
                 >
                     <svg
@@ -177,7 +177,7 @@ export const CreateLobbyPage = () => {
                 <ClipboardCopy textToCopy={"Text to copy"} />
 
                 <TelegramShareButton
-                    url="https://www.youtube.com"
+                    params={{ url: "https://www.youtube.com" }}
                     className="flex items-center justify-center gap-x-4 rounded-2xl bg-black/30 px-6 py-4 text-xl font-bold shadow-lg transition-colors duration-150 active:bg-white/15"
                 >
                     <svg
