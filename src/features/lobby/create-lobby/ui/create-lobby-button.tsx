@@ -30,6 +30,7 @@ export const CreateLobbyButton: React.FC<CreateLobbyButtonProps> = ({
             headers: {
                 "Content-Type": "application/json"
             },
+            method: "POST",
             body: JSON.stringify(request)
         });
 
