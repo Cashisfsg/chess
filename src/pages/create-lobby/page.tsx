@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ClipboardCopy } from "@/shared/ui/clipboard-copy";
 import { TelegramShareButton } from "@/shared/ui/telegram-share-button";
 import { useTelegramBackButton } from "@/shared/lib/hooks/use-telegram-back-button";
+import { useStorage } from "@/shared/lib/hooks/use-storage";
 import { TelegramClient } from "@/shared/api/telegram/types";
 
 export const CreateLobbyPage = () => {
@@ -11,6 +12,7 @@ export const CreateLobbyPage = () => {
 
     const navigate = useNavigate();
     const params = useParams();
+    const [, dispatch] = useStorage<"black" | "white">("color", sessionStorage);
 
     const user = useRef(
         (window as Window & typeof globalThis & { Telegram: TelegramClient })
@@ -33,7 +35,14 @@ export const CreateLobbyPage = () => {
         socket.onmessage = (event: MessageEvent) => {
             const response = JSON.parse(event.data);
 
-            if (!("data" in response) || response.data !== "start_game") return;
+            if (
+                !("data" in response) ||
+                !("type" in response) ||
+                response.type !== "start_game"
+            )
+                return;
+
+            dispatch({ type: "set", payload: response.data });
 
             navigate(`/game/${params.roomId}`);
         };
