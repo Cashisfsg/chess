@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { TelegramClient } from "@/shared/api/telegram/types";
 import { composeEventHandlers } from "@/shared/lib/utils/compose-event-handlers";
@@ -14,6 +15,8 @@ export const CreateLobbyButton: React.FC<CreateLobbyButtonProps> = ({
         (window as Window & typeof globalThis & { Telegram: TelegramClient })
             .Telegram.WebApp.initDataUnsafe?.user
     );
+
+    const navigate = useNavigate();
 
     const onClickHandler = async () => {
         const user = currentUser.current;
@@ -37,10 +40,9 @@ export const CreateLobbyButton: React.FC<CreateLobbyButtonProps> = ({
             }
         );
 
-        const data = await response.json();
+        const room_id = await response.json();
 
-        console.log("Response data: ");
-        console.log(data);
+        navigate(`/lobby/${room_id}`);
     };
 
     return (

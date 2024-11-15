@@ -1,9 +1,47 @@
+import { useEffect, useRef } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+
 import { ClipboardCopy } from "@/shared/ui/clipboard-copy";
 import { TelegramShareButton } from "@/shared/ui/telegram-share-button";
 import { useTelegramBackButton } from "@/shared/lib/hooks/use-telegram-back-button";
+import { TelegramClient } from "@/shared/api/telegram/types";
 
 export const CreateLobbyPage = () => {
     useTelegramBackButton();
+
+    const navigate = useNavigate();
+    const params = useParams();
+
+    const user = useRef(
+        (window as Window & typeof globalThis & { Telegram: TelegramClient })
+            .Telegram.WebApp.initDataUnsafe?.user
+    );
+
+    useEffect(() => {
+        if (
+            !("roomId" in params) ||
+            !params.roomId ||
+            !user.current ||
+            !user.current.id
+        )
+            return;
+
+        const socket = new WebSocket(
+            `wss://www.chesswebapp.xyz/api/v1/room/ws?room_id=${params.roomId}&user_id=${user.current.id}`
+        );
+
+        socket.onmessage = (event: MessageEvent) => {
+            const response = JSON.parse(event.data);
+
+            if (!("data" in response) || response.data !== "start_game") return;
+
+            navigate(`/game/${params.roomId}`);
+        };
+
+        return () => {
+            socket.close(1000, "Close connection");
+        };
+    }, [params]);
 
     return (
         <main className="grid flex-auto grid-rows-[auto_1fr_1fr] gap-y-6">
