@@ -26,13 +26,16 @@ export const CreateLobbyButton: React.FC<CreateLobbyButtonProps> = ({
             private: false
         };
 
-        const response = await fetch(import.meta.env.VITE_BASE_API_URL, {
-            headers: {
-                "Content-Type": "application/json"
-            },
-            method: "POST",
-            body: JSON.stringify(request)
-        });
+        const response = await fetch(
+            `${import.meta.env.VITE_BASE_API_URL}/room/create`,
+            {
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                method: "POST",
+                body: JSON.stringify(request)
+            }
+        );
 
         const data = await response.json();
 
