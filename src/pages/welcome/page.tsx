@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 
 import { TelegramClient } from "@/shared/api/telegram/types";
 import { createNewUser } from "@/entities/user/api/create-user";
@@ -45,6 +45,10 @@ export const WelcomePage = () => {
             }
         })();
     }, [tg?.initDataUnsafe?.user]);
+
+    if (tg.initDataUnsafe.start_param !== undefined) {
+        return <Navigate to={`/lobby/${tg.initDataUnsafe.start_param}`} />;
+    }
 
     return (
         <main className="grid flex-auto place-content-center gap-y-8">

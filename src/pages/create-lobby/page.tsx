@@ -122,10 +122,14 @@ export const CreateLobbyPage = () => {
                     <h2>Ссылка для игрока</h2>
                 </header>
 
-                <ClipboardCopy textToCopy={"dasdasdad"} />
+                <ClipboardCopy
+                    textToCopy={`https://t.me/test_chess_cboyxd_bot?startapp=${params.roomId}`}
+                />
 
                 <TelegramShareButton
-                    params={{ url: "https://www.google.com" }}
+                    params={{
+                        url: `https://t.me/test_chess_cboyxd_bot?startapp=${params.roomId}`
+                    }}
                     className="flex items-center justify-center gap-x-4 rounded-2xl bg-black/30 px-6 py-4 text-xl font-bold shadow-lg transition-colors duration-150 active:bg-white/15"
                 >
                     <svg
@@ -172,7 +176,7 @@ export const CreateLobbyPage = () => {
                 </TelegramShareButton>
             </section>
 
-            <section className="flex flex-col gap-y-4 rounded-md bg-black/20 px-4 py-3">
+            {/* <section className="flex flex-col gap-y-4 rounded-md bg-black/20 px-4 py-3">
                 <header className="flex flex-col items-center gap-y-4 text-xl font-bold">
                     <svg
                         width="55"
@@ -260,7 +264,7 @@ export const CreateLobbyPage = () => {
                     </svg>
                     <span>Поделиться</span>
                 </TelegramShareButton>
-            </section>
+            </section> */}
         </main>
     );
 };
