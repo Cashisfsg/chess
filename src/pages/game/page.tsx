@@ -78,12 +78,6 @@ export const GamePage = () => {
                                 `[data-piece=${boardOrientation ? boardOrientation[0] + "K" : "wK"}]`
                             )
                             ?.classList.add("attacked");
-                    } else {
-                        document
-                            .querySelector(
-                                `[data-piece=${boardOrientation ? boardOrientation[0] + "K" : "wK"}]`
-                            )
-                            ?.classList.remove("attacked");
                     }
 
                     break;
@@ -113,6 +107,14 @@ export const GamePage = () => {
         setChess(newChess);
 
         socket?.send(JSON.stringify({ type: "move", data: chess.fen() }));
+
+        if (!newChess.isCheck()) {
+            document
+                .querySelector(
+                    `[data-piece=${boardOrientation ? boardOrientation[0] + "K" : "wK"}]`
+                )
+                ?.classList.remove("attacked");
+        }
 
         if (
             chess.moves().length === 0 &&
