@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { SearchGameButton } from "@/features/game/search";
 
 import { useTelegramBackButton } from "@/shared/lib/hooks/use-telegram-back-button";
+import { CreateLobbyButton } from "@/features/lobby/create-lobby";
 
 export const SearchPage = () => {
     useTelegramBackButton();
@@ -52,6 +53,8 @@ export const SearchPage = () => {
                     </svg>
                     <span className="text-2xl font-bold">Создать лобби</span>
                 </Link>
+
+                <CreateLobbyButton>Create lobby</CreateLobbyButton>
 
                 {/* <Link
                     to="/test"
