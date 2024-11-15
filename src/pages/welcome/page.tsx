@@ -47,7 +47,7 @@ export const WelcomePage = () => {
     }, [tg?.initDataUnsafe?.user]);
 
     if (tg.initDataUnsafe.start_param !== undefined) {
-        return <Navigate to={`/game/${tg.initDataUnsafe.start_param}`} />;
+        return <Navigate to={`/lobby/${tg.initDataUnsafe.start_param}`} />;
     }
 
     return (
