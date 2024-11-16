@@ -60,6 +60,13 @@ export const GamePage = () => {
             const { type } = response;
 
             switch (type) {
+                case "init":
+                    if (!("data" in response)) break;
+
+                    setChess(new Chess(response.data));
+
+                    break;
+
                 case "move": {
                     const { ok } = validateFen(response.data);
 
@@ -82,6 +89,16 @@ export const GamePage = () => {
 
                     break;
                 }
+
+                case "connect_user":
+                    if (!("data" in response)) break;
+
+                    sessionStorage.setItem(
+                        "game_time_start",
+                        JSON.stringify(response.data)
+                    );
+
+                    break;
 
                 default:
                     break;
@@ -142,6 +159,20 @@ export const GamePage = () => {
             return;
         }
     }
+
+    // function makeARandomMove() {
+    //     const availableMoves = chess.moves();
+    //     const randomMove =
+    //         availableMoves[Math.round(Math.random() * availableMoves.length)];
+
+    //     chess.move(randomMove);
+
+    //     const newChess = new Chess(chess.fen());
+
+    //     setChess(newChess);
+
+    //     socket?.send(JSON.stringify({ type: "move", data: chess.fen() }));
+    // }
 
     function onDrop(sourceSquare: Square, targetSquare: Square) {
         try {
