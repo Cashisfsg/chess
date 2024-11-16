@@ -160,19 +160,21 @@ export const GamePage = () => {
         }
     }
 
-    // function makeARandomMove() {
-    //     const availableMoves = chess.moves();
-    //     const randomMove =
-    //         availableMoves[Math.round(Math.random() * availableMoves.length)];
+    function makeARandomMove() {
+        if (!boardOrientation?.startsWith(chess.turn())) return;
 
-    //     chess.move(randomMove);
+        const availableMoves = chess.moves();
+        const randomMove =
+            availableMoves[Math.round(Math.random() * availableMoves.length)];
 
-    //     const newChess = new Chess(chess.fen());
+        chess.move(randomMove);
 
-    //     setChess(newChess);
+        const newChess = new Chess(chess.fen());
 
-    //     socket?.send(JSON.stringify({ type: "move", data: chess.fen() }));
-    // }
+        setChess(newChess);
+
+        socket?.send(JSON.stringify({ type: "move", data: chess.fen() }));
+    }
 
     function onDrop(sourceSquare: Square, targetSquare: Square) {
         try {

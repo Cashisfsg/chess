@@ -32,7 +32,7 @@ export const UserCard: React.FC<UserCardProps> = ({ fullname, color }) => {
             <span className="justify-self-start text-sm">{fullname}</span>
 
             <div
-                className={`flex items-center gap-x-2.5 self-center px-2.5 py-1.5 text-2xl ${color === "white" ? "bg-[#262421] text-white" : "bg-white text-[#262421]"}`}
+                className={`flex items-center gap-x-2.5 self-center px-2.5 py-1.5 text-2xl ${color === "black" ? "bg-[#262421] text-white" : "bg-white text-[#262421]"}`}
             >
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
