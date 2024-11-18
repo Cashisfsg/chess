@@ -54,11 +54,11 @@ export const GamePage = () => {
     useEffect(() => {
         if (boardOrientation === undefined) return;
 
-        if (!boardOrientation.startsWith(chess.turn())) return;
+        if (boardOrientation !== "white") return;
 
         timerRef.current = setTimeout(() => {
             makeARandomMove();
-        }, 10000);
+        }, 5000);
     }, [boardOrientation]);
 
     useEffect(() => {
@@ -107,11 +107,11 @@ export const GamePage = () => {
                             ?.classList.add("attacked");
                     }
 
-                    if (boardOrientation?.startsWith(chess.turn())) break;
+                    if (!boardOrientation?.startsWith(newChess.turn())) break;
 
                     timerRef.current = setTimeout(() => {
                         makeARandomMove();
-                    }, 10000);
+                    }, 5000);
 
                     break;
                 }
