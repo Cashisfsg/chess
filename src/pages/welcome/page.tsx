@@ -1,10 +1,11 @@
 import { useEffect } from "react";
 import { Link, Navigate } from "react-router-dom";
 
-import { TelegramClient } from "@/shared/api/telegram/types";
+import { GameStatistics } from "@/entities/game";
 import { createNewUser } from "@/entities/user/api/create-user";
 
 import { useTelegramCloudStorage } from "@/shared/lib/hooks/use-telegram-cloud-storage";
+import { TelegramClient } from "@/shared/api/telegram/types";
 
 export const WelcomePage = () => {
     const tg = (
@@ -56,12 +57,7 @@ export const WelcomePage = () => {
                 <h1 className="text-balance text-5xl font-bold">
                     Играть Шахматы Онлайн
                 </h1>
-                <p className="mt-4">
-                    <span className="text-white/80">
-                        <b className="text-white">12 456</b> онлайн
-                        пользователей
-                    </span>
-                </p>
+                <GameStatistics />
             </header>
 
             <section className="grid gap-y-8">

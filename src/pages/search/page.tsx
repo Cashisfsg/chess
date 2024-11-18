@@ -1,7 +1,8 @@
 import { SearchGameButton } from "@/features/game/search";
 
-import { useTelegramBackButton } from "@/shared/lib/hooks/use-telegram-back-button";
 import { CreateLobbyButton } from "@/features/lobby/create-lobby";
+import { GameStatistics } from "@/entities/game";
+import { useTelegramBackButton } from "@/shared/lib/hooks/use-telegram-back-button";
 
 export const SearchPage = () => {
     useTelegramBackButton();
@@ -51,12 +52,7 @@ export const SearchPage = () => {
             </section>
 
             <footer>
-                <p className="mt-4">
-                    <span className="text-white/80">
-                        <strong className="text-white">12 456</strong> онлайн
-                        пользователей
-                    </span>
-                </p>
+                <GameStatistics />
             </footer>
         </main>
     );
