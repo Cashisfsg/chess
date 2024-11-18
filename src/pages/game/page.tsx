@@ -107,7 +107,7 @@ export const GamePage = () => {
                             ?.classList.add("attacked");
                     }
 
-                    if (!boardOrientation?.startsWith(chess.turn())) break;
+                    if (boardOrientation?.startsWith(chess.turn())) break;
 
                     timerRef.current = setTimeout(() => {
                         makeARandomMove();
