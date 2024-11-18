@@ -54,6 +54,12 @@ export const GamePage = () => {
     useEffect(() => {
         if (!socket) return;
 
+        if (boardOrientation?.startsWith(chess.turn())) {
+            timerRef.current = setTimeout(() => {
+                makeARandomMove();
+            }, 10000);
+        }
+
         socket.addEventListener("message", (event: MessageEvent) => {
             const response = JSON.parse(event.data);
 
@@ -90,6 +96,10 @@ export const GamePage = () => {
                             )
                             ?.classList.add("attacked");
                     }
+
+                    timerRef.current = setTimeout(() => {
+                        makeARandomMove();
+                    }, 10000);
 
                     break;
                 }
@@ -134,9 +144,6 @@ export const GamePage = () => {
         socket?.send(JSON.stringify({ type: "move", data: chess.fen() }));
 
         clearTimeout(timerRef.current);
-        timerRef.current = setTimeout(() => {
-            makeARandomMove();
-        }, 10000);
 
         if (!newChess.isCheck()) {
             document
@@ -188,6 +195,41 @@ export const GamePage = () => {
         setChess(newChess);
 
         socket?.send(JSON.stringify({ type: "move", data: chess.fen() }));
+
+        if (!newChess.isCheck()) {
+            document
+                .querySelector(
+                    `[data-piece=${boardOrientation ? boardOrientation[0] + "K" : "wK"}]`
+                )
+                ?.classList.remove("attacked");
+        }
+
+        if (
+            chess.isStalemate()
+            // chess.moves().length === 0 &&
+            // !chess.isCheckmate() &&
+            // chess.isDraw()
+        ) {
+            socket?.send(JSON.stringify({ type: "draw", detail: "stalemate" }));
+            return;
+        }
+
+        if (chess.isCheckmate()) {
+            if (!boardOrientation)
+                throw Error(
+                    "Board orientation does not exist in session storage"
+                );
+
+            socket?.send(
+                JSON.stringify({ type: "checkmate", winner: boardOrientation })
+            );
+            return;
+        }
+
+        if (chess.isDraw()) {
+            socket?.send(JSON.stringify({ type: "draw", detail: "draw" }));
+            return;
+        }
     }
 
     function onDrop(sourceSquare: Square, targetSquare: Square) {
