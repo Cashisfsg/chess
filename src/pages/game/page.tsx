@@ -33,13 +33,7 @@ export const GamePage = () => {
         sessionStorage
     );
 
-    const timerRef = useRef<NodeJS.Timeout | undefined>(
-        boardOrientation?.startsWith(chess.turn())
-            ? setTimeout(() => {
-                  makeARandomMove();
-              }, 10000)
-            : undefined
-    );
+    const timerRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
     useEffect(() => {
         if (!("roomId" in params) || !params?.roomId) return;
@@ -56,6 +50,16 @@ export const GamePage = () => {
             disconnect();
         };
     }, [params, tg?.initDataUnsafe?.user]);
+
+    useEffect(() => {
+        if (boardOrientation === undefined) return;
+
+        if (!boardOrientation.startsWith(chess.turn())) return;
+
+        timerRef.current = setTimeout(() => {
+            makeARandomMove();
+        }, 10000);
+    }, [boardOrientation]);
 
     useEffect(() => {
         if (!socket) return;
