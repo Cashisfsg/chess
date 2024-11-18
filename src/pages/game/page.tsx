@@ -133,6 +133,7 @@ export const GamePage = () => {
 
         socket?.send(JSON.stringify({ type: "move", data: chess.fen() }));
 
+        clearTimeout(timerRef.current);
         timerRef.current = setTimeout(() => {
             makeARandomMove();
         }, 10000);
