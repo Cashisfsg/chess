@@ -7,7 +7,12 @@ interface GameStatisticsProps extends React.ComponentPropsWithoutRef<"p"> {}
 export const GameStatistics: React.FC<GameStatisticsProps> = props => {
     const { data, isLoading } = useSWR<{ active_users: number }>(
         "/stats/all",
-        baseQuery
+        baseQuery,
+        {
+            // refreshInterval: 5000,
+            // revalidateOnMount: false,
+            onError: error => console.error(error)
+        }
     );
 
     return (

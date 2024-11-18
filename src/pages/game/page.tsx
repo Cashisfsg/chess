@@ -91,12 +91,12 @@ export const GamePage = () => {
                             ?.classList.add("attacked");
                     }
 
-                    timerRef.current = setTimeout(() => {
-                        makeARandomMove();
-                    }, 30000);
-
                     break;
                 }
+
+                case "game_over":
+                    clearTimeout(timerRef.current);
+                    break;
 
                 case "connect_user":
                     if (!("data" in response)) break;
@@ -133,6 +133,10 @@ export const GamePage = () => {
 
         socket?.send(JSON.stringify({ type: "move", data: chess.fen() }));
 
+        timerRef.current = setTimeout(() => {
+            makeARandomMove();
+        }, 10000);
+
         if (!newChess.isCheck()) {
             document
                 .querySelector(
@@ -142,9 +146,10 @@ export const GamePage = () => {
         }
 
         if (
-            chess.moves().length === 0 &&
-            !chess.isCheckmate() &&
-            chess.isDraw()
+            chess.isStalemate()
+            // chess.moves().length === 0 &&
+            // !chess.isCheckmate() &&
+            // chess.isDraw()
         ) {
             socket?.send(JSON.stringify({ type: "draw", detail: "stalemate" }));
             return;

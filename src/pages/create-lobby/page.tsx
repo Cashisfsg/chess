@@ -185,7 +185,7 @@ export const CreateLobbyPage = () => {
                 </TelegramShareButton>
             </section>
 
-            {/* <section className="flex flex-col gap-y-4 rounded-md bg-black/20 px-4 py-3">
+            <section className="flex flex-col gap-y-4 rounded-md bg-black/20 px-4 py-3">
                 <header className="flex flex-col items-center gap-y-4 text-xl font-bold">
                     <svg
                         width="55"
@@ -273,7 +273,7 @@ export const CreateLobbyPage = () => {
                     </svg>
                     <span>Поделиться</span>
                 </TelegramShareButton>
-            </section> */}
+            </section>
         </main>
     );
 };
