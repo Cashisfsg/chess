@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 
 import { Chess, Square, validateFen } from "chess.js";
@@ -21,6 +21,8 @@ type Move =
 
 export const GamePage = () => {
     const [chess, setChess] = useState(new Chess());
+
+    const timerRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
     const tg = (
         window as Window & typeof globalThis & { Telegram: TelegramClient }
@@ -68,6 +70,8 @@ export const GamePage = () => {
                     break;
 
                 case "move": {
+                    clearTimeout(timerRef.current);
+
                     const { ok } = validateFen(response.data);
 
                     if (!ok) {
@@ -86,6 +90,10 @@ export const GamePage = () => {
                             )
                             ?.classList.add("attacked");
                     }
+
+                    timerRef.current = setTimeout(() => {
+                        makeARandomMove();
+                    }, 30000);
 
                     break;
                 }
