@@ -12,13 +12,13 @@ interface SuccessState<D> {
     error: null;
 }
 
-interface ErrorState<D> {
+interface ErrorState {
     status: "error";
-    data: D | undefined;
+    data: undefined;
     error: Error;
 }
 
-type State<D> = InitialState | SuccessState<D> | ErrorState<D>;
+type State<D> = InitialState | SuccessState<D> | ErrorState;
 
 type ReducerAction<D> =
     | { type: "reinitialize" }
@@ -46,7 +46,7 @@ const defaultSerializer = <T>(item: T): string => {
         return JSON.stringify(item);
     } catch (error) {
         throw new Error(
-            `Error during serializing JSON: ${(error as Error).message}`
+            `Error occurred during serializing JSON: ${(error as Error).message}`
         );
     }
 };
@@ -56,7 +56,7 @@ const defaultDeserializer = <T>(item: string): T => {
         return JSON.parse(item);
     } catch (error) {
         throw new Error(
-            `Error during parsing JSON: ${(error as Error).message}`
+            `Error occurred during parsing JSON: ${(error as Error).message}`
         );
     }
 };
@@ -78,6 +78,7 @@ const reducer = <T>(state: State<T>, action: ReducerAction<T>): State<T> => {
             return {
                 ...state,
                 status: "error",
+                data: undefined,
                 error: action.payload
             };
 

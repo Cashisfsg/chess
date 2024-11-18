@@ -103,7 +103,7 @@ export const GamePage = () => {
 
                     sessionStorage.setItem(
                         "game_time_start",
-                        JSON.stringify(response.data)
+                        JSON.stringify(response.data + 600000)
                     );
 
                     break;
