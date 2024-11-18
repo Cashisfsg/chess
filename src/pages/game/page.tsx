@@ -22,8 +22,6 @@ type Move =
 export const GamePage = () => {
     const [chess, setChess] = useState(new Chess());
 
-    const timerRef = useRef<NodeJS.Timeout | undefined>(undefined);
-
     const tg = (
         window as Window & typeof globalThis & { Telegram: TelegramClient }
     ).Telegram.WebApp;
@@ -33,6 +31,14 @@ export const GamePage = () => {
     const [{ data: boardOrientation }] = useStorage<"black" | "white">(
         "color",
         sessionStorage
+    );
+
+    const timerRef = useRef<NodeJS.Timeout | undefined>(
+        boardOrientation?.startsWith(chess.turn())
+            ? setTimeout(() => {
+                  makeARandomMove();
+              }, 10000)
+            : undefined
     );
 
     useEffect(() => {
@@ -54,11 +60,11 @@ export const GamePage = () => {
     useEffect(() => {
         if (!socket) return;
 
-        if (boardOrientation?.startsWith(chess.turn())) {
-            timerRef.current = setTimeout(() => {
-                makeARandomMove();
-            }, 10000);
-        }
+        // if (boardOrientation?.startsWith(chess.turn())) {
+        //     timerRef.current = setTimeout(() => {
+        //         makeARandomMove();
+        //     }, 10000);
+        // }
 
         socket.addEventListener("message", (event: MessageEvent) => {
             const response = JSON.parse(event.data);
@@ -76,7 +82,7 @@ export const GamePage = () => {
                     break;
 
                 case "move": {
-                    clearTimeout(timerRef.current);
+                    // clearTimeout(timerRef.current);
 
                     const { ok } = validateFen(response.data);
 
