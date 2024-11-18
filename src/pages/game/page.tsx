@@ -192,7 +192,7 @@ export const GamePage = () => {
     }
 
     function makeARandomMove() {
-        if (!boardOrientation?.startsWith(chess.turn())) return;
+        // if (!boardOrientation?.startsWith(chess.turn())) return;
 
         const availableMoves = chess.moves();
         const randomMove =
