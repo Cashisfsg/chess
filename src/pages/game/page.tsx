@@ -25,6 +25,7 @@ export const GamePage = () => {
     const tg = (
         window as Window & typeof globalThis & { Telegram: TelegramClient }
     ).Telegram.WebApp;
+    const user = tg?.initDataUnsafe?.user;
 
     const params = useParams();
     const { socket, connect, disconnect } = useWebSocketContext();
@@ -38,8 +39,6 @@ export const GamePage = () => {
     useEffect(() => {
         if (!("roomId" in params) || !params?.roomId) return;
 
-        const user = tg?.initDataUnsafe?.user;
-
         if (!user?.id) return;
 
         const { roomId } = params;
@@ -49,7 +48,7 @@ export const GamePage = () => {
         return () => {
             disconnect();
         };
-    }, [params, tg?.initDataUnsafe?.user]);
+    }, [params, user]);
 
     useEffect(() => {
         if (boardOrientation === undefined) return;
@@ -58,7 +57,7 @@ export const GamePage = () => {
 
         timerRef.current = setTimeout(() => {
             makeARandomMove(chess);
-        }, 5000);
+        }, 30000);
     }, [boardOrientation]);
 
     useEffect(() => {
@@ -111,7 +110,7 @@ export const GamePage = () => {
 
                     timerRef.current = setTimeout(() => {
                         makeARandomMove(newChess);
-                    }, 5000);
+                    }, 30000);
 
                     break;
                 }

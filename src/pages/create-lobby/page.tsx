@@ -132,12 +132,12 @@ export const CreateLobbyPage = () => {
                 </header>
 
                 <ClipboardCopy
-                    textToCopy={`https://t.me/test_chess_cboyxd_bot?startapp=${params.roomId}`}
+                    textToCopy={`https://t.me/test_chess_cboyxd_bot?startapp=p${params.roomId}`}
                 />
 
                 <TelegramShareButton
                     params={{
-                        url: `https://t.me/test_chess_cboyxd_bot?startapp=${params.roomId}`
+                        url: `https://t.me/test_chess_cboyxd_bot?startapp=p${params.roomId}`
                     }}
                     className="flex items-center justify-center gap-x-4 rounded-2xl bg-black/30 px-6 py-4 text-xl font-bold shadow-lg transition-colors duration-150 active:bg-white/15"
                 >
@@ -225,10 +225,14 @@ export const CreateLobbyPage = () => {
                     </svg>
                     <h2>Ссылка для зрителей</h2>
                 </header>
-                <ClipboardCopy textToCopy={"Text to copy"} />
+                <ClipboardCopy
+                    textToCopy={`https://t.me/test_chess_cboyxd_bot?startapp=s${params.roomId}`}
+                />
 
                 <TelegramShareButton
-                    params={{ url: "https://www.youtube.com" }}
+                    params={{
+                        url: `https://t.me/test_chess_cboyxd_bot?startapp=s${params.roomId}`
+                    }}
                     className="flex items-center justify-center gap-x-4 rounded-2xl bg-black/30 px-6 py-4 text-xl font-bold shadow-lg transition-colors duration-150 active:bg-white/15"
                 >
                     <svg

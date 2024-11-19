@@ -11,6 +11,7 @@ export const WelcomePage = () => {
     const tg = (
         window as Window & typeof globalThis & { Telegram: TelegramClient }
     ).Telegram.WebApp;
+    const startParam = tg.initDataUnsafe.start_param;
 
     const [, dispatch] = useTelegramCloudStorage<{
         user_id: string;
@@ -47,8 +48,12 @@ export const WelcomePage = () => {
         })();
     }, [tg?.initDataUnsafe?.user]);
 
-    if (tg.initDataUnsafe.start_param !== undefined) {
-        return <Navigate to={`/lobby/${tg.initDataUnsafe.start_param}`} />;
+    if (startParam !== undefined) {
+        return (
+            <Navigate
+                to={`/${startParam.startsWith("p") ? "lobby" : "room"}/${startParam.substring(1)}`}
+            />
+        );
     }
 
     return (
