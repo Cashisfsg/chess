@@ -57,7 +57,7 @@ export const GamePage = () => {
         if (boardOrientation !== "white") return;
 
         timerRef.current = setTimeout(() => {
-            makeARandomMove();
+            makeARandomMove(chess);
         }, 5000);
     }, [boardOrientation]);
 
@@ -110,7 +110,7 @@ export const GamePage = () => {
                     if (!boardOrientation?.startsWith(newChess.turn())) break;
 
                     timerRef.current = setTimeout(() => {
-                        makeARandomMove();
+                        makeARandomMove(newChess);
                     }, 5000);
 
                     break;
@@ -193,7 +193,7 @@ export const GamePage = () => {
         }
     }
 
-    function makeARandomMove() {
+    function makeARandomMove(chess: Chess) {
         // if (!boardOrientation?.startsWith(chess.turn())) return;
 
         const availableMoves = chess.moves();
