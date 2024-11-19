@@ -40,7 +40,6 @@ export const TelegramShareButton: React.FC<TelegramShareButtonProps> = ({
     return (
         <button
             onClick={composeEventHandlers(onClick, onClickHandler)}
-            // href={`https://t.me/share/url?url=${url}&text=${caption}&to=${receiver}`}
             {...props}
         />
     );

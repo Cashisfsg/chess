@@ -22,9 +22,8 @@ export const CreateLobbyPage = () => {
     useEffect(() => {
         if (
             !("roomId" in params) ||
-            !params.roomId ||
-            !user.current ||
-            !user.current.id
+            params.roomId === undefined ||
+            user.current === undefined
         )
             return;
 
