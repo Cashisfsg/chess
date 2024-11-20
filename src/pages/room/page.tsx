@@ -111,7 +111,7 @@ export const RoomPage = () => {
                             method: "PATCH",
                             body: JSON.stringify({
                                 user_id: user.current?.id,
-                                room_id: params.roomId
+                                room_id: parseInt(params.roomId || "0")
                             })
                         });
                     } catch (error) {
@@ -121,6 +121,7 @@ export const RoomPage = () => {
             >
                 Add spectator
             </button>
+
             <UserCard
                 fullname={`User-${users.white}`}
                 color="white"
