@@ -100,6 +100,27 @@ export const RoomPage = () => {
                     isDraggablePiece={() => false}
                 />
             </div>
+
+            <button
+                onClick={async () => {
+                    try {
+                        await baseQuery("/room/add_spectator", {
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            method: "PATCH",
+                            body: JSON.stringify({
+                                user_id: user.current?.id,
+                                room_id: params.roomId
+                            })
+                        });
+                    } catch (error) {
+                        console.error(error);
+                    }
+                }}
+            >
+                Add spectator
+            </button>
             <UserCard
                 fullname={`User-${users.white}`}
                 color="white"
