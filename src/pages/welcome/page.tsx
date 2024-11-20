@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Link, Navigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { GameStatistics } from "@/entities/game";
 import { createNewUser } from "@/entities/user/api/create-user";
@@ -13,6 +13,7 @@ export const WelcomePage = () => {
     ).Telegram.WebApp;
     const startParam = tg.initDataUnsafe.start_param;
 
+    const navigate = useNavigate();
     const [, dispatch] = useTelegramCloudStorage<{
         user_id: string;
         fullname: string;
@@ -26,35 +27,41 @@ export const WelcomePage = () => {
             try {
                 const user = await dispatch({ type: "read" });
 
-                if (user) return;
-
-                await createNewUser({
-                    user_id: String(tg?.initDataUnsafe?.user?.id),
-                    fullname: tg?.initDataUnsafe?.user.first_name,
-                    username: tg?.initDataUnsafe?.user?.username
-                });
-
-                await dispatch({
-                    type: "create",
-                    payload: {
+                if (!user) {
+                    await createNewUser({
                         user_id: String(tg?.initDataUnsafe?.user?.id),
                         fullname: tg?.initDataUnsafe?.user.first_name,
                         username: tg?.initDataUnsafe?.user?.username
-                    }
-                });
+                    });
+
+                    await dispatch({
+                        type: "create",
+                        payload: {
+                            user_id: String(tg?.initDataUnsafe?.user?.id),
+                            fullname: tg?.initDataUnsafe?.user.first_name,
+                            username: tg?.initDataUnsafe?.user?.username
+                        }
+                    });
+                }
+
+                if (startParam === undefined) return;
+
+                navigate(
+                    `/${startParam.startsWith("p") ? "lobby" : "room"}/${startParam.substring(1)}`
+                );
             } catch (error) {
                 console.error((error as Error)?.message);
             }
         })();
     }, [tg?.initDataUnsafe?.user]);
 
-    if (startParam !== undefined) {
-        return (
-            <Navigate
-                to={`/${startParam.startsWith("p") ? "lobby" : "room"}/${startParam.substring(1)}`}
-            />
-        );
-    }
+    // if (startParam !== undefined) {
+    //     return (
+    //         <Navigate
+    //             to={`/${startParam.startsWith("p") ? "lobby" : "room"}/${startParam.substring(1)}`}
+    //         />
+    //     );
+    // }
 
     return (
         <main className="grid flex-auto place-content-center gap-y-8">
