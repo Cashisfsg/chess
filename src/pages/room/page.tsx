@@ -7,6 +7,8 @@ import { UserCard } from "@/entities/user/ui/user-card";
 import { GameOverDialog } from "@/widgets/game-over-dialog/ui/game-over-dialog";
 import { TelegramClient } from "@/shared/api/telegram/types";
 
+import { baseQuery } from "@/shared/api/config";
+
 export const RoomPage = () => {
     const chess = useMemo(() => {
         return new Chess();
@@ -20,36 +22,50 @@ export const RoomPage = () => {
     );
 
     useEffect(() => {
-        if (
-            !("roomId" in params) ||
-            params.roomId === undefined ||
-            user.current === undefined ||
-            user.current.id === undefined
-        )
-            return;
+        let socket: WebSocket | null = null;
 
-        const socket = new WebSocket(
-            `wss://www.chesswebapp.xyz/api/v1/watch?user_id=${user.current.id}&room_id=${params.roomId}`
-        );
+        (async () => {
+            if (
+                !("roomId" in params) ||
+                params.roomId === undefined ||
+                user.current === undefined ||
+                user.current.id === undefined
+            )
+                return;
 
-        socket.onmessage = (event: MessageEvent) => {
-            const response = JSON.parse(event.data);
+            try {
+                await baseQuery("/room/add_spectator", {
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    method: "POST",
+                    body: JSON.stringify({
+                        user_id: user.current.id,
+                        room_id: params.roomId
+                    })
+                });
 
-            if (!("type" in response) || !("data" in response)) return;
+                socket = new WebSocket(
+                    `wss://www.chesswebapp.xyz/api/v1/watch?user_id=${user.current.id}&room_id=${params.roomId}`
+                );
 
-            switch (response.type) {
-                case "move":
-                    chess.load(response.data);
-                    setFen(chess.fen());
-                    break;
+                socket.onmessage = (event: MessageEvent) => {
+                    const response = JSON.parse(event.data);
 
-                default:
-                    break;
+                    if (!("type" in response) || !("data" in response)) return;
+
+                    if (response.type === "move") {
+                        chess.load(response.data);
+                        setFen(chess.fen());
+                    }
+                };
+            } catch (error) {
+                console.error(error);
             }
-        };
+        })();
 
         return () => {
-            socket.close(1000, "Close connection");
+            socket?.close(1000, "Close connection");
         };
     }, [chess, params]);
 
