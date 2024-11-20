@@ -14,6 +14,7 @@ export const RoomPage = () => {
         return new Chess();
     }, []);
     const [fen, setFen] = useState(chess.fen());
+    const [users, setUsers] = useState({ black: undefined, white: undefined });
     const params = useParams();
 
     const user = useRef(
@@ -54,9 +55,26 @@ export const RoomPage = () => {
 
                     if (!("type" in response) || !("data" in response)) return;
 
-                    if (response.type === "move") {
-                        chess.load(response.data);
-                        setFen(chess.fen());
+                    const { type, data } = response;
+
+                    switch (type) {
+                        case "start_watch":
+                            chess.load(data.fen);
+                            setFen(chess.fen());
+                            setUsers(users => ({
+                                ...users,
+                                white: data.white_piece_user_id,
+                                black: data.black_piece_user_id
+                            }));
+                            break;
+
+                        case "move":
+                            chess.load(data);
+                            setFen(chess.fen());
+                            break;
+
+                        default:
+                            break;
                     }
                 };
             } catch (error) {
@@ -74,7 +92,7 @@ export const RoomPage = () => {
             className={"flex max-h-full flex-auto basis-full flex-col gap-y-8"}
         >
             <UserCard
-                fullname={"User"}
+                fullname={`User-${users.black}`}
                 color="black"
             />
             <div className="flex aspect-square flex-auto items-center">
@@ -85,7 +103,7 @@ export const RoomPage = () => {
                 />
             </div>
             <UserCard
-                fullname={"User"}
+                fullname={`User-${users.white}`}
                 color="white"
             />
             <GameOverDialog />
