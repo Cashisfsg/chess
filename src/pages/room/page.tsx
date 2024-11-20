@@ -39,7 +39,7 @@ export const RoomPage = () => {
                     headers: {
                         "Content-Type": "application/json"
                     },
-                    method: "POST",
+                    method: "PATCH",
                     body: JSON.stringify({
                         user_id: user.current.id,
                         room_id: params.roomId
@@ -88,9 +88,7 @@ export const RoomPage = () => {
     }, [chess, params]);
 
     return (
-        <main
-            className={"flex max-h-full flex-auto basis-full flex-col gap-y-8"}
-        >
+        <main className="flex max-h-full flex-auto basis-full flex-col gap-y-8">
             <UserCard
                 fullname={`User-${users.black}`}
                 color="black"
