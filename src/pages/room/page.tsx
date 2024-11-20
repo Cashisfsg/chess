@@ -106,6 +106,7 @@ export const RoomPage = () => {
                     try {
                         await baseQuery("/room/add_spectator", {
                             headers: {
+                                accept: "application/json",
                                 "Content-Type": "application/json"
                             },
                             method: "PATCH",
