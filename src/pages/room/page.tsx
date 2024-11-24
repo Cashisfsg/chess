@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { Chess } from "chess.js";
 import { Chessboard } from "react-chessboard";
 import { UserCard } from "@/entities/user/ui/user-card";
-import { GameOverDialog } from "@/widgets/game-over-dialog/ui/game-over-dialog";
+import { GameOverDialogMultiPlayer } from "@/widgets/game-over-dialog/ui/game-over-dialog-multi-player";
 import { TelegramClient } from "@/shared/api/telegram/types";
 
 import { baseQuery } from "@/shared/api/config";
@@ -106,7 +106,7 @@ export const RoomPage = () => {
                 fullname={`User-${users.white}`}
                 color="white"
             />
-            <GameOverDialog />
+            <GameOverDialogMultiPlayer />
         </main>
     );
 };

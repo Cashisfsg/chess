@@ -10,7 +10,7 @@ interface PartyDetails {
     description: string;
 }
 
-export const GameOverDialog = () => {
+export const GameOverDialogMultiPlayer = () => {
     const [details, setDetails] = useState<PartyDetails>({
         label: "",
         description: ""

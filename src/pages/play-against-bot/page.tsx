@@ -2,6 +2,7 @@ import { useState, useMemo, useRef } from "react";
 import { Chess, Square } from "chess.js";
 import { Chessboard } from "react-chessboard";
 
+import { GameOverDialogSinglePlayer } from "@/widgets/game-over-dialog";
 import { UserCard } from "@/entities/user/ui/user-card";
 import { TelegramClient } from "@/shared/api/telegram/types";
 
@@ -23,6 +24,8 @@ export const PlayAgainstBotPage = () => {
         (window as Window & typeof globalThis & { Telegram: TelegramClient })
             .Telegram.WebApp.initDataUnsafe?.user
     );
+    const dialogRef = useRef<HTMLDialogElement>(null);
+
     const selectedPiece = useRef<{
         square: string;
         color: string;
@@ -32,9 +35,11 @@ export const PlayAgainstBotPage = () => {
         color: "",
         moves: []
     });
+
     const makeAMove = (move: Move) => {
         chess.move(move);
         setFen(chess.fen());
+        if (chess.isGameOver()) dialogRef.current?.showModal();
     };
 
     const makeARandomMove = () => {
@@ -46,6 +51,7 @@ export const PlayAgainstBotPage = () => {
 
         chess.move(randomMove);
         setFen(chess.fen());
+        if (chess.isGameOver()) dialogRef.current?.showModal();
     };
 
     const onDrop = (sourceSquare: Square, targetSquare: Square) => {
@@ -183,20 +189,30 @@ export const PlayAgainstBotPage = () => {
                 />
             </div>
 
-            <button
-                onClick={() => {
-                    chess.move("d4");
-                    setFen(chess.fen());
-                }}
-            >
-                Move d4
-            </button>
-
             <UserCard
                 fullname={user.current?.first_name}
                 color="white"
             />
-            {/* <GameOverDialog /> */}
+
+            <GameOverDialogSinglePlayer
+                dialogRef={dialogRef}
+                label={
+                    chess.isCheckmate()
+                        ? "Мат"
+                        : chess.isDraw() || chess.isStalemate()
+                          ? "Ничья"
+                          : ""
+                }
+                description={
+                    chess.isCheckmate()
+                        ? `Победили ${chess.turn() === "w" ? "белые" : "черные"}`
+                        : chess.isDraw()
+                          ? "Победила дружба"
+                          : chess.isStalemate()
+                            ? "Пат"
+                            : ""
+                }
+            />
         </main>
     );
 };

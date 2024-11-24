@@ -6,7 +6,7 @@ import { Chessboard } from "react-chessboard";
 
 import { useWebSocketContext } from "@/app/providers/web-socket/use-web-socket-context";
 
-import { GameOverDialog } from "@/widgets/game-over-dialog";
+import { GameOverDialogMultiPlayer } from "@/widgets/game-over-dialog";
 import { UserCard } from "@/entities/user";
 import { TelegramClient } from "@/shared/api/telegram/types";
 import { useStorage } from "@/shared/lib/hooks/use-storage";
@@ -389,7 +389,7 @@ export const GamePage = () => {
                 fullname={tg?.initDataUnsafe?.user?.first_name}
                 color={boardOrientation === "white" ? "white" : "black"}
             />
-            <GameOverDialog />
+            <GameOverDialogMultiPlayer />
         </main>
     );
 };
