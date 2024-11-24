@@ -205,6 +205,12 @@ interface StoryShareParams {
     widget_link?: StoryWidgetLink;
 }
 
+interface PopupParams {
+    title?: string;
+    message: string;
+    buttons?: PopupButton[];
+}
+
 type PopupButtonType = "default" | "ok" | "close" | "cancel" | "destructive";
 
 interface PopupButton {
@@ -213,16 +219,65 @@ interface PopupButton {
     text?: string;
 }
 
-interface PopupParams {
-    title?: string;
-    message: string;
-    buttons?: PopupButton[];
+// https://core.telegram.org/bots/webapps#safeareainset
+interface SafeAreaInset {
+    top: number;
+    bottom: number;
+    left: number;
+    right: number;
+}
+
+// https://core.telegram.org/bots/webapps#contentsafeareainset
+interface ContentSafeAreaInset {
+    top: number;
+    bottom: number;
+    left: number;
+    right: number;
+}
+
+// https://core.telegram.org/bots/webapps#accelerometer
+interface Accelerometer {
+    isStarted: boolean;
+    x: number;
+    y: number;
+    z: number;
+    start: (
+        params: AccelerometerStartParams,
+        callback?: (success: boolean) => void
+    ) => void;
+    stop: (callback?: (success: boolean) => void) => void;
+}
+
+// https://core.telegram.org/bots/webapps#accelerometerstartparams
+interface AccelerometerStartParams {
+    refresh_rate?: number;
+}
+
+// https://core.telegram.org/bots/webapps#deviceorientation
+interface DeviceOrientation {
+    isStarted: boolean;
+    absolute: boolean;
+    alpha: number;
+    beta: number;
+    gamma: number;
+    start: (
+        params: DeviceOrientationStartParams,
+        callback?: (success: boolean) => void
+    ) => void;
+    stop: (callback?: (success: boolean) => void) => void;
+}
+
+// https://core.telegram.org/bots/webapps#deviceorientationstartparams
+interface DeviceOrientationStartParams {
+    refresh_rate?: number;
+    need_absolute?: boolean;
 }
 
 interface ScanQrPopupParams {
     text?: string;
 }
 
+// https://core.telegram.org/bots/webapps#initializing-mini-apps
 interface WebApp {
     initData: string;
     initDataUnsafe: WebAppInitData;
@@ -230,6 +285,7 @@ interface WebApp {
     platform: string;
     colorScheme: string;
     themeParams: ThemeParams;
+    isActive: boolean;
     isExpanded: boolean;
     viewportHeight: number;
     viewportStableHeight: number;
@@ -238,6 +294,10 @@ interface WebApp {
     bottomBarColor: string;
     isClosingConfirmationEnabled: boolean;
     isVerticalSwipesEnabled: boolean;
+    isFullscreen: boolean;
+    isOrientationLocked: boolean;
+    safeAreaInset: SafeAreaInset;
+    contentSafeAreaInset: ContentSafeAreaInset;
     BackButton: BackButton;
     MainButton: MainButton;
     SecondaryButton: MainButton;
@@ -245,6 +305,8 @@ interface WebApp {
     HapticFeedback: HapticFeedback;
     CloudStorage: CloudStorage;
     BiometricManager: BiometricManager;
+    Accelerometer: Accelerometer;
+    DeviceOrientation: DeviceOrientation;
     isVersionAtLeast: (version: string) => boolean;
     setHeaderColor: (color: string) => void;
     setBackgroundColor: (color: string) => void;

@@ -118,7 +118,7 @@ export const PlayAgainstBotPage = () => {
                 color="black"
             />
 
-            <div className="flex aspect-square flex-auto items-center">
+            <div className="flex flex-auto items-center">
                 <Chessboard
                     areArrowsAllowed={false}
                     position={fen}
@@ -205,7 +205,7 @@ export const PlayAgainstBotPage = () => {
                 }
                 description={
                     chess.isCheckmate()
-                        ? `Победили ${chess.turn() === "w" ? "белые" : "черные"}`
+                        ? `Победили ${chess.turn() === "w" ? "черные" : "белые"}`
                         : chess.isDraw()
                           ? "Победила дружба"
                           : chess.isStalemate()
