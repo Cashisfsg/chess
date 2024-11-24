@@ -122,7 +122,7 @@ export const PlayAgainstBotPage = () => {
                 <Chessboard
                     areArrowsAllowed={false}
                     position={fen}
-                    isDraggablePiece={() => chess.turn() === "w"}
+                    isDraggablePiece={({ piece }) => piece.startsWith("w")}
                     onPieceClick={(piece, square) => {
                         if (chess.turn() !== "w") return;
 

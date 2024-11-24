@@ -175,8 +175,12 @@ interface BiometricManager {
 }
 
 type EventType =
+    | "activated"
+    | "deactivated"
     | "themeChanged"
     | "viewportChanged"
+    | "safeAreaChanged"
+    | "contentSafeAreaChanged"
     | "mainButtonClicked"
     | "secondaryButtonClicked"
     | "backButtonClicked"
