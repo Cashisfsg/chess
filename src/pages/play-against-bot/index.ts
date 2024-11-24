@@ -1,0 +1,1 @@
+export { PlayAgainstBotPage } from "./page";

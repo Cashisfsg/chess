@@ -47,7 +47,7 @@ export const SearchPage = () => {
                             fill="#D5A47D"
                         />
                     </svg>
-                    <span className="text-2xl font-bold">Создать лобби</span>{" "}
+                    <span className="text-2xl font-bold">Создать лобби</span>
                 </CreateLobbyButton>
             </section>
 

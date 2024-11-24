@@ -9,6 +9,7 @@ import { GamePage } from "@/pages/game";
 import { RoomPage } from "@/pages/room/page";
 import { TestPage } from "@/pages/test-page";
 import { CreateLobbyPage } from "@/pages/create-lobby";
+import { PlayAgainstBotPage } from "@/pages/play-against-bot";
 
 const router = createBrowserRouter([
     {
@@ -18,6 +19,10 @@ const router = createBrowserRouter([
     {
         path: "search",
         element: <SearchPage />
+    },
+    {
+        path: "/play/bot",
+        element: <PlayAgainstBotPage />
     },
     {
         path: "game/:roomId",

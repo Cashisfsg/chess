@@ -196,8 +196,8 @@ export const GamePage = () => {
         // if (!boardOrientation?.startsWith(chess.turn())) return;
 
         const availableMoves = chess.moves();
-        const randomMove =
-            availableMoves[Math.round(Math.random() * availableMoves.length)];
+        const index = Math.round(Math.random() * (availableMoves.length - 1));
+        const randomMove = availableMoves[index];
 
         chess.move(randomMove);
 

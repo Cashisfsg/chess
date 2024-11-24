@@ -93,35 +93,14 @@ export const RoomPage = () => {
                 fullname={`User-${users.black}`}
                 color="black"
             />
+
             <div className="flex aspect-square flex-auto items-center">
                 <Chessboard
                     areArrowsAllowed={false}
                     position={fen}
-                    isDraggablePiece={() => false}
+                    arePiecesDraggable={false}
                 />
             </div>
-
-            <button
-                onClick={async () => {
-                    try {
-                        await baseQuery("/room/add_spectator", {
-                            headers: {
-                                accept: "application/json",
-                                "Content-Type": "application/json"
-                            },
-                            method: "PATCH",
-                            body: JSON.stringify({
-                                user_id: user.current?.id,
-                                room_id: parseInt(params.roomId || "0")
-                            })
-                        });
-                    } catch (error) {
-                        console.error(error);
-                    }
-                }}
-            >
-                Add spectator
-            </button>
 
             <UserCard
                 fullname={`User-${users.white}`}
