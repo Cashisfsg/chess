@@ -304,7 +304,7 @@ export const GamePage = () => {
                 fullname={"User"}
                 color={boardOrientation === "white" ? "black" : "white"}
             />
-            <div className="flex aspect-square flex-auto items-center">
+            <div className="flex flex-auto items-center">
                 <Chessboard
                     areArrowsAllowed={true}
                     boardOrientation={boardOrientation}

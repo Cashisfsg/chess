@@ -94,7 +94,7 @@ export const RoomPage = () => {
                 color="black"
             />
 
-            <div className="flex aspect-square flex-auto items-center">
+            <div className="flex flex-auto items-center">
                 <Chessboard
                     areArrowsAllowed={false}
                     position={fen}
