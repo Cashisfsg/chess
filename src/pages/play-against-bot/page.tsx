@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { Chess, Square } from "chess.js";
 import { Chessboard } from "react-chessboard";
 
@@ -26,6 +26,9 @@ export const PlayAgainstBotPage = () => {
     );
     const dialogRef = useRef<HTMLDialogElement>(null);
 
+    const boardOrientation = useRef<"black" | "white">(
+        (["black", "white"] as const)[Math.round(Math.random())]
+    );
     const selectedPiece = useRef<{
         square: string;
         color: string;
@@ -53,6 +56,12 @@ export const PlayAgainstBotPage = () => {
         setFen(chess.fen());
         if (chess.isGameOver()) dialogRef.current?.showModal();
     };
+
+    useEffect(() => {
+        if (boardOrientation.current === "white") return;
+
+        makeARandomMove();
+    }, []);
 
     const onDrop = (sourceSquare: Square, targetSquare: Square) => {
         try {
@@ -115,16 +124,26 @@ export const PlayAgainstBotPage = () => {
         <main className="flex max-h-full flex-auto basis-full flex-col gap-y-8">
             <UserCard
                 fullname="Bot"
-                color="black"
+                color={boardOrientation.current === "white" ? "black" : "white"}
             />
 
             <div className="flex flex-auto items-center">
                 <Chessboard
                     areArrowsAllowed={false}
+                    boardOrientation={boardOrientation.current}
                     position={fen}
-                    isDraggablePiece={({ piece }) => piece.startsWith("w")}
+                    isDraggablePiece={({ piece }) =>
+                        piece.startsWith(
+                            boardOrientation.current.substring(0, 1)
+                        )
+                    }
                     onPieceClick={(piece, square) => {
-                        if (chess.turn() !== "w") return;
+                        console.log(boardOrientation.current);
+                        console.log(chess.turn());
+
+                        if (!boardOrientation.current.startsWith(chess.turn()))
+                            return;
+                        console.log("First check");
 
                         const { color } = chess.get(square);
 
@@ -191,7 +210,7 @@ export const PlayAgainstBotPage = () => {
 
             <UserCard
                 fullname={user.current?.first_name}
-                color="white"
+                color={boardOrientation.current === "white" ? "white" : "black"}
             />
 
             <GameOverDialogSinglePlayer
@@ -206,9 +225,9 @@ export const PlayAgainstBotPage = () => {
                 description={
                     chess.isCheckmate()
                         ? `Победили ${chess.turn() === "w" ? "черные" : "белые"}`
-                        : chess.isDraw()
+                        : chess.isStalemate()
                           ? "Победила дружба"
-                          : chess.isStalemate()
+                          : chess.isDraw()
                             ? "Пат"
                             : ""
                 }
