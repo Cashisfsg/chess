@@ -13,8 +13,6 @@ interface WebAppUser {
     photo_url?: string;
 }
 
-type WebAppChatType = "group" | "supergroup" | "channel";
-
 interface WebAppChat {
     id: number;
     type: WebAppChatType;
@@ -22,6 +20,10 @@ interface WebAppChat {
     username?: string;
     photo_url?: string;
 }
+
+type WebAppChatType = "group" | "supergroup" | "channel";
+
+// https://core.telegram.org/bots/webapps#webappinitdata
 interface WebAppInitData {
     query_id?: string;
     user?: WebAppUser;
@@ -33,6 +35,7 @@ interface WebAppInitData {
     can_send_after?: number;
     auth_date: number;
     hash: string;
+    signature: string;
 }
 
 interface ThemeParams {
@@ -115,10 +118,10 @@ export interface CloudStorage {
         value: string,
         callback: (error: string | null, success?: boolean) => void
 
-        // callback?: {
-        //     (error: string): void;
-        //     (error: null, success: boolean): void;
-        // }
+        //     callback?: {
+        //         (error: string): void;
+        //         (error: null, success: boolean): void;
+        //     }
     ) => void;
     getItem: (
         key: string,
@@ -174,6 +177,7 @@ interface BiometricManager {
     openSettings: () => void;
 }
 
+// https://core.telegram.org/bots/webapps#events-available-for-mini-apps
 type EventType =
     | "activated"
     | "deactivated"
@@ -194,7 +198,31 @@ type EventType =
     | "contactRequested"
     | "biometricManagerUpdated"
     | "biometricAuthRequested"
-    | "biometricTokenUpdated";
+    | "biometricTokenUpdated"
+    | "fullscreenChanged"
+    | "fullscreenFailed"
+    | "homeScreenAdded"
+    | "homeScreenChecked"
+    | "accelerometerStarted"
+    | "accelerometerStopped"
+    | "accelerometerChanged"
+    | "accelerometerFailed"
+    | "deviceOrientationStarted"
+    | "deviceOrientationStopped"
+    | "deviceOrientationChanged"
+    | "deviceOrientationFailed"
+    | "gyroscopeStarted"
+    | "gyroscopeStopped"
+    | "gyroscopeChanged"
+    | "gyroscopeFailed"
+    | "locationManagerUpdated"
+    | "locationRequested"
+    | "shareMessageSent"
+    | "shareMessageFailed"
+    | "emojiStatusSet"
+    | "emojiStatusFailed"
+    | "emojiStatusAccessRequested"
+    | "fileDownloadRequested";
 
 interface StoryWidgetLink {
     url: string;
@@ -273,8 +301,63 @@ interface DeviceOrientationStartParams {
     need_absolute?: boolean;
 }
 
+// https://core.telegram.org/bots/webapps#gyroscope
+interface Gyroscope {
+    isStarted: boolean;
+    x: number;
+    y: number;
+    z: number;
+    start: (
+        params: GyroscopeStartParams,
+        callback?: (success: boolean) => void
+    ) => void;
+    stop: (callback?: (success: boolean) => void) => void;
+}
+
+// https://core.telegram.org/bots/webapps#gyroscopestartparams
+interface GyroscopeStartParams {
+    refresh_rate?: number;
+}
+
+// https://core.telegram.org/bots/webapps#locationmanager
+interface LocationManager {
+    isInited: boolean;
+    isLocationAvailable: boolean;
+    isAccessRequested: boolean;
+    isAccessGranted: boolean;
+    init: (callback?: () => void) => void;
+    getLocation: (callback: (data: LocationData | null) => void) => void;
+    openSettings: () => void;
+}
+
+// https://core.telegram.org/bots/webapps#locationdata
+interface LocationData {
+    latitude: number;
+    longitude: number;
+    altitude: number | null;
+    course: number | null;
+    speed: number | null;
+    horizontal_accuracy: number | null;
+    vertical_accuracy: number | null;
+    course_accuracy: number | null;
+    speed_accuracy: number | null;
+}
+
 interface ScanQrPopupParams {
     text?: string;
+}
+
+type HomeScreenStatus = "unsupported" | "unknown" | "added" | "missed";
+
+// https://core.telegram.org/bots/webapps#emojistatusparams
+interface EmojiStatusParams {
+    duration?: number;
+}
+
+// https://core.telegram.org/bots/webapps#downloadfileparams
+interface DownloadFileParams {
+    url: string;
+    file_name: string;
 }
 
 // https://core.telegram.org/bots/webapps#initializing-mini-apps
@@ -307,6 +390,8 @@ interface WebApp {
     BiometricManager: BiometricManager;
     Accelerometer: Accelerometer;
     DeviceOrientation: DeviceOrientation;
+    Gyroscope: Gyroscope;
+    LocationManager: LocationManager;
     isVersionAtLeast: (version: string) => boolean;
     setHeaderColor: (color: string) => void;
     setBackgroundColor: (color: string) => void;
@@ -315,6 +400,14 @@ interface WebApp {
     disableClosingConfirmation: () => void;
     enableVerticalSwipes: () => void;
     disableVerticalSwipes: () => void;
+    requestFullscreen: () => void;
+    exitFullscreen: () => void;
+    lockOrientation: () => void;
+    unlockOrientation: () => void;
+    addToHomeScreen: () => void;
+    checkHomeScreenStatus: (
+        callback?: (status: HomeScreenStatus) => void
+    ) => void;
     onEvent: (eventType: EventType, eventHandler: () => void) => void;
     offEvent: (eventType: EventType, eventHandler: () => void) => void;
     sendData: (data: { data: string; button_text: string }) => void;
@@ -322,6 +415,22 @@ interface WebApp {
     openTelegramLink: (url: string) => void;
     openInvoice: (url: string, callback?: (status: string) => void) => void;
     shareToStory: (media_url: string, params?: StoryShareParams) => void;
+    shareMessage: (
+        message_id: string,
+        callback?: (success: boolean) => void
+    ) => void;
+    setEmojiStatus: (
+        custom_emoji_id: string,
+        params?: EmojiStatusParams,
+        callback?: (success: boolean) => void
+    ) => void;
+    requestEmojiStatusAccess: (
+        callback?: (accessGranted: boolean) => void
+    ) => void;
+    downloadFile: (
+        params: DownloadFileParams,
+        callback?: (downloadAccepted: boolean) => void
+    ) => void;
     showPopup: (params: PopupParams, callback?: (id: string) => void) => void;
     showAlert: (message: string, callback?: () => void) => void;
     showConfirm: (

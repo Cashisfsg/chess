@@ -5,7 +5,7 @@ export const useTimeout = (callback: () => void, delay: number = 300) => {
 
     useLayoutEffect(() => {
         callbackTimeout.current = callback;
-    });
+    }, [callback]);
 
     useEffect(() => {
         if (delay <= 0) return;

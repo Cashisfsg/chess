@@ -41,6 +41,7 @@ const reducer = <T>(state: State<T>, action: Action<T>): State<T> => {
     switch (action.type) {
         case "pending":
             return { ...state, status: "pending", error: null };
+
         case "fulfilled":
             return {
                 ...state,
@@ -48,6 +49,7 @@ const reducer = <T>(state: State<T>, action: Action<T>): State<T> => {
                 data: action.payload,
                 error: null
             };
+
         case "rejected":
             return { ...state, status: "rejected", error: action.payload };
 
@@ -66,7 +68,9 @@ export const useFetch = <T, P>(
     query: (searchParams: P, requestOptions?: RequestInit) => Promise<Response>,
     searchParams: P
 ): State<T> => {
-    const [state, dispatch] = useReducer(reducer, initialState);
+    const [state, dispatch] = useReducer<
+        (state: State<T>, action: Action<T>) => State<T>
+    >(reducer, initialState);
 
     useEffect(() => {
         const controller = new AbortController();
@@ -82,9 +86,9 @@ export const useFetch = <T, P>(
                     throw new Error("Something went wrong");
                 }
 
-                const result = (await response.json()) as T;
+                const data = await response.json();
 
-                dispatch({ type: "fulfilled", payload: result });
+                dispatch({ type: "fulfilled", payload: data });
             } catch (error) {
                 if ((error as Error).name === "AbortError") {
                     console.error(
@@ -102,5 +106,5 @@ export const useFetch = <T, P>(
         };
     }, [query, searchParams]);
 
-    return state as State<T>;
+    return state;
 };

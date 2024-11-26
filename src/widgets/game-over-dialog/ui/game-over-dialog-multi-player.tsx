@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 
 import { useWebSocketContext } from "@/app/providers/web-socket/use-web-socket-context";
 
+import { useTimeout } from "@/shared/lib/hooks/use-timeout";
 import { AlertDialog } from "@/shared/ui/alert-dialog";
 
 interface PartyDetails {
@@ -17,6 +18,11 @@ export const GameOverDialogMultiPlayer = () => {
     });
     const dialogRef = useRef<HTMLDialogElement>(null);
     const { socket, disconnect } = useWebSocketContext();
+
+    useTimeout(() => {
+        dialogRef.current?.showModal();
+        socket?.send(JSON.stringify({ type: "draw", detail: "draw" }));
+    }, 5000);
 
     useEffect(() => {
         if (!socket) return;
