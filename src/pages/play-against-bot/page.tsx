@@ -73,7 +73,7 @@ export const PlayAgainstBotPage = () => {
 
             setTimeout(() => {
                 makeARandomMove();
-            }, 300);
+            }, 500);
 
             return true;
         } catch (error) {
