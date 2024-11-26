@@ -17,5 +17,5 @@ export const useTimeout = (callback: () => void, delay: number = 300) => {
         return () => {
             clearTimeout(timeout);
         };
-    }, [callbackTimeout, delay]);
+    }, [delay]);
 };

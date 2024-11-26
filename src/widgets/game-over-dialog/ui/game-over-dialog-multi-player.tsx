@@ -19,11 +19,6 @@ export const GameOverDialogMultiPlayer = () => {
     const dialogRef = useRef<HTMLDialogElement>(null);
     const { socket, disconnect } = useWebSocketContext();
 
-    useTimeout(() => {
-        dialogRef.current?.showModal();
-        socket?.send(JSON.stringify({ type: "draw", detail: "draw" }));
-    }, 5000);
-
     useEffect(() => {
         if (!socket) return;
 
@@ -81,6 +76,13 @@ export const GameOverDialogMultiPlayer = () => {
             disconnect();
         });
     }, [socket, disconnect]);
+
+    const onTimeoutHandler = () => {
+        dialogRef.current?.showModal();
+        socket?.send(JSON.stringify({ type: "draw", detail: "draw" }));
+    };
+
+    useTimeout(onTimeoutHandler, 600000);
 
     return (
         <AlertDialog.Root>
