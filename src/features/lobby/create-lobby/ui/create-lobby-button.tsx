@@ -25,8 +25,8 @@ export const CreateLobbyButton: React.FC<CreateLobbyButtonProps> = ({
 
         const request = {
             user_id: user.id,
-            name: "room-name",
-            private: false
+            name: `room-${Date.now()}-${Math.random().toString(36).substring(2, 5)}`,
+            private: true
         };
 
         const response = await fetch(
