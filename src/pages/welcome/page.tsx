@@ -155,7 +155,7 @@ export const WelcomePage = () => {
                     <span className="text-2xl font-bold">Игра против бота</span>
                 </Link>
 
-                <button
+                {/* <button
                     onClick={() => {
                         tg.CloudStorage.getKeys((_, keys) => {
                             if (keys === undefined) return;
@@ -164,7 +164,7 @@ export const WelcomePage = () => {
                     }}
                 >
                     Очистить облачное хранилище
-                </button>
+                </button> */}
             </section>
         </main>
     );
