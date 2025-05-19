@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 import { GameStatistics } from "@/entities/game";
 import { createNewUser } from "@/entities/user/api/create-user";
+import { checkUserExists } from "@/entities/user/api/check-user-exists";
 
 import { useTelegramCloudStorage } from "@/shared/lib/hooks/use-telegram-cloud-storage";
 import { TelegramClient } from "@/shared/api/telegram/types";
@@ -25,9 +26,11 @@ export const WelcomePage = () => {
             if (!tg?.initDataUnsafe?.user?.id) return;
 
             try {
-                const user = await dispatch({ type: "read" });
+                const { exists } = await checkUserExists(
+                    String(tg?.initDataUnsafe?.user?.id)
+                );
 
-                if (!user) {
+                if (!exists) {
                     await createNewUser({
                         user_id: String(tg?.initDataUnsafe?.user?.id),
                         fullname: tg?.initDataUnsafe?.user.first_name,
@@ -44,13 +47,20 @@ export const WelcomePage = () => {
                     });
                 }
 
+                // const user = await dispatch({ type: "read" });
+
+                // if (!user) {
+                // }
+
                 if (startParam === undefined) return;
 
                 navigate(
                     `/${startParam.startsWith("p") ? "lobby" : "room"}/${startParam.substring(1)}`
                 );
             } catch (error) {
-                console.error((error as Error)?.message);
+                if (error instanceof Error) {
+                    console.error(error.message);
+                }
             }
         })();
     }, [tg?.initDataUnsafe?.user]);
